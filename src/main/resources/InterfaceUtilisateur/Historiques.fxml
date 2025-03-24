@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="636.0" prefWidth="965" styleClass="main-container" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.HistoriquesController">
+
+    <stylesheets>
+        <URL value="@../style/style.css" />
+    </stylesheets>
+
+    <children>
+        <!-- En-tête -->
+        <VBox spacing="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <!-- Titre principal -->
+                        <HBox alignment="CENTER" style="-fx-background-color: #f0f0f0; -fx-background-radius: 5;">
+                            <padding>
+                                <Insets bottom="10" left="10" right="10" top="10" />
+                            </padding>
+                            <Text style="-fx-font-weight: bold;" text="Historiques">
+                                <font>
+                                    <Font size="24.0" />
+                                </font>
+                            </Text>
+                        </HBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnExporter" mnemonicParsing="false" styleClass="primary-button" text="Exporter">
+                            <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../icon/export.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnImprimer" mnemonicParsing="false" styleClass="secondary-button" text="Imprimer">
+                            <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../icon/store.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <!-- Contenu principal - utilisation de ScrollPane pour la responsivité -->
+        <ScrollPane fitToWidth="true" styleClass="transparent-scrollpane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+            <content>
+                <VBox spacing="20.0">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="0.0" />
+                    </padding>
+                    <children>
+
+                        <!-- Section Statistiques -->
+                        <VBox spacing="10.0">
+                            <children>
+                                <HBox styleClass="panel-header">
+                                    <children>
+                                        <Label styleClass="panel-title" text="Statistiques" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <ComboBox fx:id="cbxPeriodeStats" prefWidth="150.0" promptText="Période" />
+                                    </children>
+                                </HBox>
+
+                            </children>
+                        </VBox>
+                        <!-- Section Dernières Transactions -->
+                        <VBox spacing="10.0">
+                            <children>
+                                <HBox styleClass="panel-header">
+                                    <children>
+                                        <Label styleClass="panel-title" text="Dernières Transactions" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnVoirPlusTransactions" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
+                                    </children>
+                                </HBox>
+                                <StackPane styleClass="panel-content">
+                                    <children>
+                                        <VBox spacing="10.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                    <children>
+                                                        <TextField fx:id="txtRechercheTransaction" promptText="Rechercher une transaction..." HBox.hgrow="ALWAYS" />
+                                                        <DatePicker fx:id="dateDebutTransaction" promptText="Date début" />
+                                                        <DatePicker fx:id="dateFinTransaction" promptText="Date fin" />
+                                                        <Button fx:id="btnFiltrerTransactions" mnemonicParsing="false" styleClass="action-button" text="Filtrer">
+                                                            <graphic>
+                                                                <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@../icon/filter.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <TableView fx:id="tableTransactions" prefHeight="200.0" VBox.vgrow="ALWAYS">
+                                                    <columns>
+                                                        <TableColumn fx:id="colTransactionId" prefWidth="80.0" text="ID" />
+                                                        <TableColumn fx:id="colTransactionDate" prefWidth="130.0" text="Date et Heure" />
+                                                        <TableColumn fx:id="colTransactionImmatriculation" prefWidth="130.0" text="Immatriculation" />
+                                                        <TableColumn fx:id="colTransactionType" prefWidth="100.0" text="Type" />
+                                                        <TableColumn fx:id="colTransactionDuree" prefWidth="100.0" text="Durée" />
+                                                        <TableColumn fx:id="colTransactionMontant" prefWidth="100.0" text="Montant" />
+                                                        <TableColumn fx:id="colTransactionStatut" prefWidth="100.0" text="Statut" />
+                                                        <TableColumn fx:id="colTransactionActions" prefWidth="100.0" text="Actions" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                    <children>
+                                                        <Label text="Pages: " />
+                                                        <Pagination fx:id="paginationTransactions" maxPageIndicatorCount="5" pageCount="10" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </VBox>
+
+                        <!-- Section Historique des Entrées/Sorties -->
+                        <VBox spacing="10.0">
+                            <children>
+                                <HBox styleClass="panel-header">
+                                    <children>
+                                        <Label styleClass="panel-title" text="Historique des Entrées/Sorties" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnVoirPlusHistorique" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
+                                    </children>
+                                </HBox>
+                                <StackPane styleClass="panel-content">
+                                    <children>
+                                        <VBox spacing="10.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                    <children>
+                                                        <TextField fx:id="txtRechercheHistorique" promptText="Rechercher..." HBox.hgrow="ALWAYS" />
+                                                        <ComboBox fx:id="cbxTypeOperation" prefWidth="150.0" promptText="Type d'opération" />
+                                                        <DatePicker fx:id="dateDebutHistorique" promptText="Date début" />
+                                                        <DatePicker fx:id="dateFinHistorique" promptText="Date fin" />
+                                                        <Button fx:id="btnFiltrerHistorique" mnemonicParsing="false" styleClass="action-button" text="Filtrer">
+                                                            <graphic>
+                                                                <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@../icon/filter.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                                <TableView fx:id="tableHistorique" prefHeight="200.0" VBox.vgrow="ALWAYS">
+                                                    <columns>
+                                                        <TableColumn fx:id="colHistoriqueId" prefWidth="70.0" text="ID" />
+                                                        <TableColumn fx:id="colHistoriqueDate" prefWidth="130.0" text="Date et Heure" />
+                                                        <TableColumn fx:id="colHistoriqueImmatriculation" prefWidth="130.0" text="Immatriculation" />
+                                                        <TableColumn fx:id="colHistoriqueType" prefWidth="90.0" text="Type" />
+                                                        <TableColumn fx:id="colHistoriqueZone" prefWidth="90.0" text="Zone" />
+                                                        <TableColumn fx:id="colHistoriquePlace" prefWidth="90.0" text="Place" />
+                                                        <TableColumn fx:id="colHistoriqueOperateur" prefWidth="100.0" text="Opérateur" />
+                                                        <TableColumn fx:id="colHistoriqueCommentaire" prefWidth="130.0" text="Commentaire" />
+                                                        <TableColumn fx:id="colHistoriqueActions" prefWidth="90.0" text="Actions" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                    <children>
+                                                        <Label text="Pages: " />
+                                                        <Pagination fx:id="paginationHistorique" maxPageIndicatorCount="5" pageCount="10" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </children>
+</AnchorPane>
