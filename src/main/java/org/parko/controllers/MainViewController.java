@@ -67,8 +67,8 @@ public class MainViewController {
         
         // S'assurer que le header est visible au démarrage
         if (mainHeader != null) {
-            mainHeader.setVisible(true);
-            mainHeader.setManaged(true);
+            mainHeader.setVisible(false);
+            mainHeader.setManaged(false);
         }
         
         // Ajouter un gestionnaire pour la fermeture de la fenêtre

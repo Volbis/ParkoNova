@@ -11,8 +11,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //URL fxmlUrl = getClass().getResource("/interfaceUtilisateur/MainView.fxml");
-        URL fxmlUrl = getClass().getResource("/interfaceUtilisateur/UserDashboard/userDashboard.fxml");
+        URL fxmlUrl = getClass().getResource("/interfaceUtilisateur/MainView.fxml");
+        // A reconnecter une fois les updates terminés
+        //URL fxmlUrl = getClass().getResource("/interfaceUtilisateur/UserDashboard/userDashboard.fxml");
         System.out.println("FXML URL: " + fxmlUrl);
         if (fxmlUrl == null) {
             System.err.println("Le fichier FXML n'a pas été trouvé!");

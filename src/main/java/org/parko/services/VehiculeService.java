@@ -7,7 +7,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class VehiculeService {
@@ -33,6 +35,33 @@ public class VehiculeService {
         return nombre;
     }
 
+    public Map<String, Integer> getVehiculesParType(int parkingId) {
+        Map<String, Integer> vehiculesParType = new HashMap<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+            CallableStatement stmt = conn.prepareCall("{CALL getVehiculeParType(?)}")) {
+            
+            stmt.setInt(1, parkingId);
+            ResultSet rs = stmt.executeQuery();
+            
+            // Initialiser les types communs avec 0 pour qu'ils apparaissent même s'il n'y en a pas
+            vehiculesParType.put("Voiture", 0);
+            vehiculesParType.put("Moto", 0);
+            
+            while (rs.next()) {
+                String type = rs.getString("type_vehicule");
+                int nombre = rs.getInt("nombre");
+                vehiculesParType.put(type, nombre);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return vehiculesParType;
+    }
+
+    // Mise à des dates précises
     public int getNombreVehiculesPresentsJour(LocalDate date) {
         int nombre = 0;
         try (Connection conn = DatabaseConnection.getConnection();

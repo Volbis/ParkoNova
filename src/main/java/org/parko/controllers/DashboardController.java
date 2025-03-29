@@ -7,6 +7,8 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Tooltip;
 //import org.parko.model.Abonnement;
 import org.parko.classes.Vehicule;
 import org.parko.services.ParkingService;
@@ -38,6 +40,7 @@ public class DashboardController implements Initializable {
     @FXML private Label lblRevenusTotaux;
     @FXML private Label lblTauxOccupation;
     @FXML private BarChart<String, Number> barChart;
+    @FXML private PieChart vehiculeTypeChart;
 
     // ID du parking actuel (à récupérer depuis la configuration ou la session)
     private int parkingId = 1; // Par défaut
@@ -202,6 +205,9 @@ public class DashboardController implements Initializable {
         mettreAJourRevenus(dateDebut, dateFin);
         mettreAJourTauxOccupation();
 
+        // Mise à jour du graphique des types de véhicules
+        mettreAJourGraphiqueTypesVehicules();
+
         // Mise à jour des graphiques
         mettreAJourGraphiqueActivite(dateDebut, dateFin);
     }
@@ -323,6 +329,61 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
+    private void mettreAJourGraphiqueTypesVehicules() {
+        try {
+            // Vider le graphique
+            vehiculeTypeChart.getData().clear();
+            
+            // Récupérer le nombre de véhicules par type
+            Map<String, Integer> vehiculesParType = vehiculeService.getVehiculesParType(parkingId);
+            
+            // Si aucune donnée n'est disponible, afficher un message
+            if (vehiculesParType.isEmpty()) {
+                // Option 1: Ajouter des données factices pour montrer un graphique vide
+                vehiculeTypeChart.getData().add(new PieChart.Data("Aucun véhicule", 1));
+                return;
+            }
+            
+            // Créer les sections du graphique
+            for (Map.Entry<String, Integer> entry : vehiculesParType.entrySet()) {
+                String typeVehicule = entry.getKey();
+                int nombre = entry.getValue();
+                
+                if (nombre > 0) { // Ne pas ajouter de section pour les types qui ont 0 véhicule
+                    PieChart.Data slice = new PieChart.Data(typeVehicule + " (" + nombre + ")", nombre);
+                    vehiculeTypeChart.getData().add(slice);
+                }
+            }
+            
+            // Ajouter des couleurs personnalisées (optionnel)
+            int colorIndex = 0;
+            String[] colors = {"#3498db", "#e74c3c", "#2ecc71", "#f1c40f", "#9b59b6"};
+            
+            for (PieChart.Data data : vehiculeTypeChart.getData()) {
+                String color = colors[colorIndex % colors.length];
+                data.getNode().setStyle("-fx-pie-color: " + color + ";");
+                colorIndex++;
+            }
+            
+            int total = vehiculesParType.values().stream().mapToInt(Integer::intValue).sum();
+            // Ajouter des tooltips montrant le pourcentage
+            for (PieChart.Data data : vehiculeTypeChart.getData()) {
+                data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                    if (newNode != null) {
+                        double percentage = (double) data.getPieValue() / total * 100;
+                        String text = String.format("%.1f%%", percentage);
+                        
+                        Tooltip tooltip = new Tooltip(text);
+                        Tooltip.install(newNode, tooltip);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+}
+
+
 /*
     // Méthode appelée lors de la fermeture de la fenêtre
     public void onClose() {

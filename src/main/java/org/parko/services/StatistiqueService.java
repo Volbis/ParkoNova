@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StatistiqueService {
-    private final int parkingId = 1; // ID du parking actuel
 
-
+    /* Deja definit dans DashBoardController */
+/*
     public int getPlacesTotales() {
         int places = 0;
         try (Connection conn = DatabaseConnection.getConnection();
@@ -28,7 +28,9 @@ public class StatistiqueService {
             e.printStackTrace();
         }
         return places;
+
     }
+
 
     // Retourne un objet stats qui contient la date, le nbVehicules, revenusTotal, frequentation
     public Statistique getStatistiquesDuJour(LocalDate date) {
@@ -60,7 +62,9 @@ public class StatistiqueService {
         if (placesTotal == 0) return 0;
         return (double) stats.getNbVehicules() / placesTotal * 100;
     }
+*/
 
+    /* ========= LES ENTREES ET SORTIES par periodes ============= */
     // Entrées par heures
     public Map<String, Integer> getEntreesParHeure(LocalDate date, int parkingId) {
         Map<String, Integer> entreesParHeure = new HashMap<>();
@@ -142,14 +146,36 @@ public class StatistiqueService {
         return resultMap;
     }
 
+    /* ========= LES REVENUS PAR PERIODES ============= */
+
     public double getRevenusTotauxPeriode(LocalDate dateDebut, LocalDate dateFin, int parkingId) {
         /* Méthode à implémenter */
         return 0;
     }
+    public Map<String, Double> getRevenusParHeure(LocalDate dateDebut, int parkingId ) {
+        Map<String, Double> revenusParHeure = new HashMap<>();
 
-    public Map<String, Double> getRevenusParHeure(LocalDate dateDebut, int parkingId) {
-        /* Méthode à implémenter */
-        return null;
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT HOUR(dateEntree) as heure, SUM(montant) as revenus " +
+                             "FROM EntreeSortie " +
+                             "WHERE DATE(dateEntree) = ?  " +
+                             "GROUP BY HOUR(dateEntree) " +
+                             "ORDER BY heure")) {
+
+            stmt.setDate(1, Date.valueOf(dateDebut));
+            //stmt.setInt(2, parkingId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String heure = String.format("%02d:00", rs.getInt("heure"));
+                revenusParHeure.put(heure, rs.getDouble("revenus"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return revenusParHeure;
     }
 
     public Map<LocalDate, Double> getRevenusParJour(LocalDate dateDebut, LocalDate dateFin, int parkingId) {
