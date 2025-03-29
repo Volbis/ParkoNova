@@ -8,7 +8,7 @@
     -primary-dark: #1d3557;
     -primary: #457b9d;
     -primary-light: #a8dadc;
-    -primary-accent: #1e3a8a;
+    -primary-accent: #335fd6e0;
     -secondary-accent: #3b82f6;
     -background: #f1f5f9;
     -accent: #e63946;
@@ -25,7 +25,7 @@
     /* Success, warning, error */
     -success: #2a9d8f;
     -warning: #e9c46a;
-    -error: #ef4444;
+    -error: #ff2424;
     -info: #3b82f6;
     
     /* Application des couleurs de base */
@@ -95,7 +95,7 @@
 .button-primary, .action-button {
     -fx-background-color: -primary-accent;
     -fx-text-fill: white;
-    -fx-background-radius: 5px;
+    -fx-background-radius: 8px;
     -fx-padding: 8px 15px;
 }
 
@@ -108,16 +108,17 @@
 }
 
 /* Bouton secondaire */
-.button-secondary {
+.button-secondary-admin {
     -fx-background-color: transparent;
-    -fx-border-color: -primary;
-    -fx-text-fill: -primary;
+    -fx-border-color: rgba(255, 255, 255, 0.795);
+    -fx-text-fill: rgba(255, 255, 255, 0.795);
     -fx-border-width: 1px;
+    -fx-border-radius: 8px;
 }
 
-.button-secondary:hover {
+.button-secondary-admin:hover {
     -fx-background-color: rgba(69, 123, 157, 0.1);
-    -fx-border-color: -primary-dark;
+    -fx-border-color: rgba(255, 255, 255, 0.795);
 }
 
 /* Bouton lien */
@@ -152,6 +153,33 @@
     -fx-border-width: 2px;
 }
 
+/* Style pour le bouton de sortie de véhicule */
+.exit-button {
+    -fx-background-color: #fd504d; 
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 1);
+}
+
+.exit-button:hover {
+    -fx-background-color: #f44336; /* Rouge un peu plus clair au survol */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.exit-button:pressed {
+    -fx-background-color: #d32f2f; /* Rouge plus foncé quand pressé */
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0, 0, 0);
+}
+
 /* Boutons de menu */
 .menu-button {
     -fx-background-color: transparent;
@@ -172,9 +200,15 @@
     -fx-background-color: #cbd5e1;
 }
 
+.menu-button-selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: -primary-accent;
+    -fx-font-weight: bold;
+}
+
 .menu-button-logout {
     -fx-background-color: transparent;
-    -fx-text-fill: -text-secondary;
+    -fx-text-fill: rgb(39, 0, 0);
     -fx-alignment: center-left;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
@@ -215,6 +249,7 @@
 }
 
 .label-header {
+    -fx-text-fill: white;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
@@ -234,6 +269,14 @@
     -fx-font-weight: bold;
 }
 
+
+/*Custon label*/
+.custom-label {
+    -fx-text-fill: -text-light;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 0;
+}
 /* Champs de texte */
 .text-field, .password-field {
     -fx-background-color: white;
@@ -257,6 +300,57 @@
 }
 
 /* Zones de texte */
+
+/* Style personnalisé pour l'email*/
+.custom-text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.589);;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-opacity: 2.0;
+}
+.custom-text-field:focused {
+    -fx-background-color: rgba(255, 255, 255, 0.589);
+}
+
+/* Style personnalisé pour le mdp */
+.custom-pswd-field {
+    -fx-background-color: rgba(255, 255, 255, 0.589);;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-font-size: 10px;
+    -fx-opacity: 2.0;
+    -fx-prompt-text-font-size: 15px; 
+}
+
+.custom-pswd-field:focused {
+    -fx-background-color: rgba(255, 255, 255, 0.589);
+    
+}
+/* Style personnalisé pour le bouton de connexion */
+.custom-login-button {
+    -fx-background-color: #252525d8;
+    -fx-text-fill: rgba(255, 255, 255, 0.863);
+    -fx-background-radius: 12px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+}
+
+.custom-login-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.863);
+    -fx-text-fill: #252525d8;
+    -fx-cursor: hand;
+}
+
+.custom-login-button:pressed {
+    -fx-background-color: #252525d8;
+    -fx-text-fill: rgba(255, 255, 255, 0.863);
+}
+
+
 .text-area {
     -fx-background-color: white;
     -fx-text-fill: -text-dark;

@@ -5,16 +5,11 @@
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -29,267 +24,52 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1832.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="583.0" prefWidth="962.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.DashboardController">
     <top>
-        <BorderPane prefHeight="60.0" style="-fx-background-color: #1e3a8a;">
-            <left>
-                <HBox alignment="CENTER_LEFT" spacing="10.0" BorderPane.alignment="CENTER">
-                    <padding>
-                        <Insets left="20.0" />
-                    </padding>
+        <HBox id="mainHeader" fx:id="mainHeader" alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Tableau de Bord">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox fx:id="horaireDate" alignment="CENTER" spacing="10.0">
                     <children>
-                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image url="@/icon/dashboard.png" />
-                            </image>
-                        </ImageView>
-                        <Label text="PARKO" textFill="WHITE">
+                        <Label text="Période:">
                             <font>
-                                <Font name="System Bold" size="24.0" />
+                                <Font size="14.0" />
                             </font>
                         </Label>
-                    </children>
-                </HBox>
-            </left>
-            <right>
-                <HBox alignment="CENTER" spacing="15.0" BorderPane.alignment="CENTER">
-                    <children>
-                        <Button fx:id="btnSettings" mnemonicParsing="false" styleClass="header-button">
+                        <ComboBox fx:id="cbxPeriode" prefWidth="150.0" promptText="Aujourd'hui" />
+                        <DatePicker fx:id="dpDebut" prefHeight="38.0" prefWidth="200.0" promptText="Date début" />
+                        <DatePicker fx:id="dpFin" prefHeight="38.0" prefWidth="204.0" promptText="Date fin" />
+                        <Button fx:id="btnActualiser" mnemonicParsing="false" styleClass="action-button" text="Actualiser">
                             <graphic>
-                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                <ImageView fitHeight="27.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image url="@/icon/dashboard.png" />
+                                        <Image url="@../icon/refresh.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button fx:id="btnNotifications" mnemonicParsing="false" styleClass="header-button">
-                            <graphic>
-                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@/icon/dashboard.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                        </Button>
-                        <Separator orientation="VERTICAL" />
-                        <HBox alignment="CENTER" spacing="10.0">
-                            <children>
-                                <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@/icon/dashboard.png" />
-                                    </image>
-                                </ImageView>
-                                <Label text="Admin" textFill="WHITE">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </HBox>
                     </children>
-                    <padding>
-                        <Insets right="20.0" />
-                    </padding>
                 </HBox>
-            </right>
-        </BorderPane>
-    </top>
-    <left>
-        <VBox prefWidth="220.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER">
+            </children>
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
             <effect>
-                <DropShadow height="10.0" radius="4.5" width="10.0">
+                <DropShadow height="5.0" radius="2.0" width="5.0">
                     <color>
                         <Color opacity="0.1" />
                     </color>
                 </DropShadow>
             </effect>
-            <children>
-                <VBox spacing="5.0">
-                    <children>
-                        <Label styleClass="label-subtitle" text="MENU PRINCIPAL" textFill="#9ca3af">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets bottom="5.0" top="20.0" />
-                            </VBox.margin>
-                        </Label>
-                        <Button fx:id="btnDashboard" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Tableau de Bord">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/dashboard.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                        <Button fx:id="btnVehicules" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Parking">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/parking.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                        <Button fx:id="btnStatistiques" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Statistiques">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/statistics.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                        <Button fx:id="btnPlaces" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Historiques">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/history.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                    </children>
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                </VBox>
-                <VBox spacing="5.0">
-                    <children>
-                        <Label styleClass="label-subtitle" text="ADMINISTRATION" textFill="#9ca3af">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets bottom="5.0" top="20.0" />
-                            </VBox.margin>
-                        </Label>
-                        <Button fx:id="btnUtilisateurs" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Utilisateurs">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@/icon/dashboard.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                        <Button fx:id="btnRapports" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Rapports">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@/icon/dashboard.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                        <Button fx:id="btnParametres" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button" text="Paramètres">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/setting.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                        </Button>
-                    </children>
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                </VBox>
-                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
-                    <padding>
-                        <Insets left="10.0" right="10.0" />
-                    </padding>
-                    <children>
-                        <Region VBox.vgrow="ALWAYS" />
-                        <Button fx:id="btnLogout" alignment="BASELINE_LEFT" graphicTextGap="10.0" mnemonicParsing="false" prefWidth="200.0" styleClass="menu-button-logout" text="Déconnexion">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image url="@../icon/logout.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                            <VBox.margin>
-                                <Insets bottom="20.0" />
-                            </VBox.margin>
-                        </Button>
-                    </children>
-                </VBox>
-            </children>
-        </VBox>
-    </left>
+        </HBox>
+    </top>
     <center>
         <BorderPane style="-fx-background-color: #f1f5f9;" BorderPane.alignment="CENTER">
-            <top>
-                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
-                    <children>
-                        <Label text="Tableau de Bord">
-                            <font>
-                                <Font name="System Bold" size="20.0" />
-                            </font>
-                        </Label>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <HBox alignment="CENTER" spacing="10.0">
-                            <children>
-                                <Label text="Période:">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Label>
-                                <ComboBox fx:id="cbxPeriode" prefWidth="150.0" promptText="Aujourd'hui" />
-                                <DatePicker fx:id="dpDebut" promptText="Date début" />
-                                <DatePicker fx:id="dpFin" promptText="Date fin" />
-                                <Button fx:id="btnActualiser" mnemonicParsing="false" styleClass="action-button" text="Actualiser">
-                                    <graphic>
-                                        <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
-                                            <image>
-                                                <Image url="@/icon/dashboard.png" />
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                </Button>
-                            </children>
-                        </HBox>
-                    </children>
-                    <padding>
-                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
-                    </padding>
-                    <effect>
-                        <DropShadow height="5.0" radius="2.0" width="5.0">
-                            <color>
-                                <Color opacity="0.1" />
-                            </color>
-                        </DropShadow>
-                    </effect>
-                </HBox>
-            </top>
             <center>
                 <ScrollPane id="contentScrollPane" fitToWidth="true" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
                     <content>
@@ -297,7 +77,7 @@
                             <children>
                                       <HBox alignment="CENTER_LEFT" spacing="10.0">
                                           <children>
-                                              <Label fx:id="lblPlacesDisponibles" text="85" textFill="#1e3a8a">
+                                              <Label fx:id="lblPlacesDisponibles" text="80" textFill="#1e3a8a">
                                                   <font>
                                                       <Font name="System Bold" size="36.0" />
                                                   </font>
@@ -483,25 +263,8 @@
                                             <children>
                                                 <HBox styleClass="panel-header">
                                                     <children>
-                                                        <Label styleClass="panel-title" text="Aperçu des Emplacements" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Button fx:id="btnVoirPlus1" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
-                                                    </children>
-                                                </HBox>
-                                                <StackPane styleClass="panel-content" VBox.vgrow="ALWAYS">
-                                                    <children>
-                                                        <PieChart fx:id="pieChart" legendSide="RIGHT" legendVisible="true" />
-                                                    </children>
-                                                </StackPane>
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="10.0" HBox.hgrow="SOMETIMES">
-                                            <children>
-                                                <HBox styleClass="panel-header">
-                                                    <children>
                                                         <Label styleClass="panel-title" text="Activité Récente" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <Button fx:id="btnVoirPlus2" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
                                                     </children>
                                                 </HBox>
                                                 <StackPane styleClass="panel-content" VBox.vgrow="ALWAYS">
@@ -679,98 +442,6 @@
                                         </VBox>
                                     </children>
                                 </HBox>
-                                <VBox spacing="10.0">
-                                    <children>
-                                        <HBox styleClass="panel-header">
-                                            <children>
-                                                <Label styleClass="panel-title" text="Dernières Transactions" />
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="btnVoirPlusTransactions" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
-                                            </children>
-                                        </HBox>
-                                        <StackPane styleClass="panel-content">
-                                            <children>
-                                                <VBox spacing="10.0">
-                                                    <children>
-                                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                                            <children>
-                                                                <TextField fx:id="txtRechercheTransaction" promptText="Rechercher une transaction..." HBox.hgrow="ALWAYS" />
-                                                                <Button fx:id="btnFiltrerTransactions" mnemonicParsing="false" styleClass="action-button" text="Filtrer">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
-                                                                            <image>
-                                                                                <Image url="@/icon/dashboard.png" />
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
-                                                                </Button>
-                                                            </children>
-                                                        </HBox>
-                                                        <TableView fx:id="tableTransactions" prefHeight="200.0">
-                                                            <columns>
-                                                                <TableColumn fx:id="colTransactionId" prefWidth="100.0" text="ID" />
-                                                                <TableColumn fx:id="colTransactionDate" prefWidth="150.0" text="Date et Heure" />
-                                                                <TableColumn fx:id="colTransactionImmatriculation" prefWidth="150.0" text="Immatriculation" />
-                                                                <TableColumn fx:id="colTransactionType" prefWidth="120.0" text="Type" />
-                                                                <TableColumn fx:id="colTransactionDuree" prefWidth="120.0" text="Durée" />
-                                                                <TableColumn fx:id="colTransactionMontant" prefWidth="120.0" text="Montant" />
-                                                                <TableColumn fx:id="colTransactionStatut" prefWidth="120.0" text="Statut" />
-                                                                <TableColumn fx:id="colTransactionActions" prefWidth="100.0" text="Actions" />
-                                                            </columns>
-                                                        </TableView>
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </StackPane>
-                                    </children>
-                                </VBox>
-                                <VBox spacing="10.0">
-                                    <children>
-                                        <HBox styleClass="panel-header">
-                                            <children>
-                                                <Label styleClass="panel-title" text="Historique des Entrées/Sorties" />
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="btnVoirPlusHistorique" mnemonicParsing="false" styleClass="link-button" text="Voir tout" />
-                                            </children>
-                                        </HBox>
-                                        <StackPane styleClass="panel-content">
-                                            <children>
-                                                <VBox spacing="10.0">
-                                                    <children>
-                                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                                            <children>
-                                                                <TextField fx:id="txtRechercheHistorique" promptText="Rechercher..." HBox.hgrow="ALWAYS" />
-                                                                <ComboBox fx:id="cbxTypeOperation" prefWidth="150.0" promptText="Type d'opération" />
-                                                                <Button fx:id="btnFiltrerHistorique" mnemonicParsing="false" styleClass="action-button" text="Filtrer">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
-                                                                            <image>
-                                                                                <Image url="@/icon/dashboard.png" />
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
-                                                                </Button>
-                                                            </children>
-                                                        </HBox>
-                                                        <TableView fx:id="tableHistorique" prefHeight="200.0">
-                                                            <columns>
-                                                                <TableColumn fx:id="colHistoriqueId" prefWidth="80.0" text="ID" />
-                                                                <TableColumn fx:id="colHistoriqueDate" prefWidth="150.0" text="Date et Heure" />
-                                                                <TableColumn fx:id="colHistoriqueImmatriculation" prefWidth="150.0" text="Immatriculation" />
-                                                                <TableColumn fx:id="colHistoriqueType" prefWidth="100.0" text="Type" />
-                                                                <TableColumn fx:id="colHistoriqueZone" prefWidth="100.0" text="Zone" />
-                                                                <TableColumn fx:id="colHistoriquePlace" prefWidth="100.0" text="Place" />
-                                                                <TableColumn fx:id="colHistoriqueOperateur" prefWidth="120.0" text="Opérateur" />
-                                                                <TableColumn fx:id="colHistoriqueCommentaire" prefWidth="150.0" text="Commentaire" />
-                                                                <TableColumn fx:id="colHistoriqueActions" prefWidth="100.0" text="Actions" />
-                                                            </columns>
-                                                        </TableView>
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </StackPane>
-                                    </children>
-                                </VBox>
                             </children>
                             <padding>
                                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

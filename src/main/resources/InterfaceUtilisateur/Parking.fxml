@@ -39,7 +39,7 @@
                                                     <Font size="24.0" />
                                                 </font>
                                             </Label>
-                                            <Label fx:id="lblPlacesTotalesVoitures" styleClass="label-count" text="50" textFill="#00a896">
+                                            <Label fx:id="lblPlacesTotalesVoitures" styleClass="label-count" text="20" textFill="#00a896">
                                                 <font>
                                                     <Font name="System Bold" size="24.0" />
                                                 </font>
@@ -63,15 +63,7 @@
                                                                     <Cursor fx:constant="HAND" />
                                                                 </cursor>
                                                             </Button>
-                                                            <Button fx:id="btnSortirVoiture" layoutX="147.0" layoutY="10.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="button-secondary" text="Sortir une voiture" textFill="WHITE">
-                                                                <padding>
-                                                                    <Insets top="4.0" />
-                                                                </padding>
-                                                                <cursor>
-                                                                    <Cursor fx:constant="HAND" />
-                                                                </cursor>
-                                                            </Button>
-                                                            <Button fx:id="btnRechercherVoiture" layoutX="285.0" layoutY="50.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="button-info" text="Rechercher" textFill="WHITE">
+                                                            <Button fx:id="btnSortirVoiture" layoutX="147.0" layoutY="10.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="exit-button" text="Sortir une voiture" textFill="WHITE">
                                                                 <padding>
                                                                     <Insets top="4.0" />
                                                                 </padding>
@@ -231,9 +223,9 @@
                                 <children>
                                     <HBox alignment="CENTER" spacing="10.0">
                                         <children>
-                                            <Label styleClass="label-subtitle" text="PLACES DISPONIBLES : " textAlignment="CENTER">
+                                            <Label styleClass="align-right" text="PLACES DISPONIBLES : " textAlignment="CENTER">
                                                 <font>
-                                                    <Font size="24.0" />
+                                                    <Font name="System Bold" size="24.0" />
                                                 </font>
                                             </Label>
                                             <Label fx:id="lblPlacesMotos" styleClass="label-count" text="15" textFill="#00a896">
@@ -246,7 +238,7 @@
                                                     <Font size="24.0" />
                                                 </font>
                                             </Label>
-                                            <Label fx:id="lblPlacesTotalesMotos" styleClass="label-count" text="30" textFill="#00a896">
+                                            <Label fx:id="lblPlacesTotalesMotos" styleClass="label-count" text="20" textFill="#00a896">
                                                 <font>
                                                     <Font name="System Bold" size="24.0" />
                                                 </font>
@@ -270,15 +262,7 @@
                                                                     <Cursor fx:constant="HAND" />
                                                                 </cursor>
                                                             </Button>
-                                                            <Button fx:id="btnSortirMoto" layoutX="147.0" layoutY="10.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="button-secondary" text="Sortir une moto" textFill="WHITE">
-                                                                <padding>
-                                                                    <Insets top="4.0" />
-                                                                </padding>
-                                                                <cursor>
-                                                                    <Cursor fx:constant="HAND" />
-                                                                </cursor>
-                                                            </Button>
-                                                            <Button fx:id="btnRechercherMoto" layoutX="285.0" layoutY="50.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="button-info" text="Rechercher" textFill="WHITE">
+                                                            <Button fx:id="btnSortirMoto" layoutX="147.0" layoutY="10.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="180.0" styleClass="exit-button" text="Sortir une moto" textFill="WHITE">
                                                                 <padding>
                                                                     <Insets top="4.0" />
                                                                 </padding>
@@ -300,26 +284,31 @@
                                              <children>
                                                 <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_1" fitHeight="150.0" fitWidth="72.0" layoutX="-1.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place21" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_2" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place31" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_3" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place41" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_4" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place51" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <ImageView fx:id="placem_5" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                        </children>
@@ -332,26 +321,31 @@
                                              <children>
                                                 <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_6" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place71" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_7" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place81" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_8" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place91" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_9" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place101" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <ImageView fx:id="placem_10" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                        </children>
@@ -371,26 +365,31 @@
                                              <children>
                                                 <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_11" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place121" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_12" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place131" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_13" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place141" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_14" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place151" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <ImageView fx:id="placem_15" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                        </children>
@@ -403,26 +402,31 @@
                                              <children>
                                                 <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_16" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place171" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_17" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place181" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_18" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place191" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                <ImageView fx:id="placem_19" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                           <Pane fx:id="place201" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
                                              <children>
                                                 <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <ImageView fx:id="placem_20" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
                                              </children>
                                           </Pane>
                                        </children>

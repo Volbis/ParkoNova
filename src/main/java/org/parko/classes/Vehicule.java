@@ -1,30 +1,21 @@
 package org.parko.classes;
 
+import java.time.LocalDateTime;
+
 public class Vehicule {
-    private int id;
-    private String plaqueImmatriculation;
+    private String immatriculation;
     private String type;
+    private LocalDateTime dateEntree;
+    private LocalDateTime dateSortie;
+    private int numeroPlace;
 
-    public Vehicule(int id, String plaqueImmatriculation, String type) {
-        this.id = id;
-        this.plaqueImmatriculation = plaqueImmatriculation;
-        this.type = type;
+    // Getters et Setters
+    public String getImmatriculation() {
+        return immatriculation;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getPlaqueImmatriculation() {
-        return plaqueImmatriculation;
-    }
-
-    public void setPlaqueImmatriculation(String plaqueImmatriculation) {
-        this.plaqueImmatriculation = plaqueImmatriculation;
+    public void setImmatriculation(String immatriculation) {
+        this.immatriculation = immatriculation;
     }
 
     public String getType() {
@@ -33,5 +24,29 @@ public class Vehicule {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public LocalDateTime getDateEntree() {
+        return dateEntree;
+    }
+
+    public void setDateEntree(LocalDateTime dateEntree) {
+        this.dateEntree = dateEntree;
+    }
+
+    public LocalDateTime getDateSortie() {
+        return dateSortie;
+    }
+
+    public void setDateSortie(LocalDateTime dateSortie) {
+        this.dateSortie = dateSortie;
+    }
+
+    public int getNumeroPlace() {
+        return numeroPlace;
+    }
+
+    public void setNumeroPlace(int numeroPlace) {
+        this.numeroPlace = numeroPlace;
     }
 }

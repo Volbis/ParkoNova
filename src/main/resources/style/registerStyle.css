@@ -1,0 +1,7 @@
+.rectangle {
+    -fx-background-color: linear-gradient(to bottom, 
+        derive(lightblue, 20%), 
+        derive(rgb(0, 89, 190), -10%)
+    );
+    -fx-background-radius: 0;
+}

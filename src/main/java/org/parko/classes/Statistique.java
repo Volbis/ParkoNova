@@ -1,37 +1,43 @@
 package org.parko.classes;
 
+import java.time.LocalDate;
+
 public class Statistique {
-    private int id;
-    private int placesOccupees;
-    private double revenus;
+    private LocalDate date;
+    private int nbVehicules;
+    private double revenusTotal;
+    private int frequentation;
 
-    public Statistique(int id, int placesOccupees, double revenus) {
-        this.id = id;
-        this.placesOccupees = placesOccupees;
-        this.revenus = revenus;
+    // Getters et Setters
+    public LocalDate getDate() {
+        return date;
     }
 
-    public int getId() {
-        return id;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getNbVehicules() {
+        return nbVehicules;
     }
 
-    public int getPlacesOccupees() {
-        return placesOccupees;
+    public void setNbVehicules(int nbVehicules) {
+        this.nbVehicules = nbVehicules;
     }
 
-    public void setPlacesOccupees(int placesOccupees) {
-        this.placesOccupees = placesOccupees;
+    public double getRevenusTotal() {
+        return revenusTotal;
     }
 
-    public double getRevenus() {
-        return revenus;
+    public void setRevenusTotal(double revenusTotal) {
+        this.revenusTotal = revenusTotal;
     }
 
-    public void setRevenus(double revenus) {
-        this.revenus = revenus;
+    public int getFrequentation() {
+        return frequentation;
+    }
+
+    public void setFrequentation(int frequentation) {
+        this.frequentation = frequentation;
     }
 }

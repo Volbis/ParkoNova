@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="636.0" prefWidth="958.0" style="-fx-background-color: transparent;" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.parkingSet.ParkingController">
+    <children>
+        <TabPane fx:id="mainTabPane" prefHeight="636.0" prefWidth="958.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Voitures">
+                    <content>
+                        <VBox prefHeight="594.0" prefWidth="938.0">
+                            <children>
+                                <HBox alignment="CENTER" prefHeight="43.0" prefWidth="865.0" spacing="10.0">
+                                    <children>
+                                        <Label styleClass="label-subtitle" text="PLACES DISPONIBLES : " textAlignment="CENTER">
+                                            <font>
+                                                <Font size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblPlacesVoitures" styleClass="label-count" text="20" textFill="#00a896">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label styleClass="label-subtitle" text=" / " textAlignment="CENTER">
+                                            <font>
+                                                <Font size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblPlacesTotalesVoitures" styleClass="label-count" text="20" textFill="#00a896">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" top="10.0" />
+                                    </padding>
+                                </HBox>
+                                <VBox fx:id="parkContent" prefHeight="551.0" prefWidth="922.0" style="-fx-background-color: transparent;">
+                                    <children>
+                                        <!-- Conteneur pour le parking -->
+                                        <Pane fx:id="parkingPane" prefHeight="550.0" prefWidth="900.0" styleClass="parkingContainer">
+                                            <!-- Première rangée de places (en haut à gauche) -->
+                                            <Pane fx:id="section1" layoutX="50.0" layoutY="50.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                <!-- Lignes de démarcation des places -->
+                                                <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+
+                                                <!-- Places de parking -->
+                                                <Pane fx:id="place1" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_1" fitHeight="150.0" fitWidth="69.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place2" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_2" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place3" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_3" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place4" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_4" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place5" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <ImageView fx:id="place_5" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                            </Pane>
+
+                                            <!-- Deuxième rangée de places (en haut à droite) -->
+                                            <Pane fx:id="section2" layoutX="500.0" layoutY="50.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                <!-- Lignes de démarcation des places -->
+                                                <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+
+                                                <!-- Places de parking -->
+                                                <Pane fx:id="place6" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_6" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place7" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_7" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place8" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_8" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place9" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_9" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place10" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <ImageView fx:id="place_10" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                            </Pane>
+
+                                            <!-- Flèche direction -->
+                                            <Pane layoutX="450.0" layoutY="125.0">
+                                                <Line endX="0.0" endY="-50.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="0.0" endY="-50.0" startX="-10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="0.0" endY="-50.0" startX="10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                            </Pane>
+
+                                            <!-- Troisième rangée de places (en bas à gauche) -->
+                                            <Pane fx:id="section3" layoutX="50.0" layoutY="300.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                <!-- Lignes de démarcation des places -->
+                                                <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+
+                                                <!-- Places de parking -->
+                                                <Pane fx:id="place11" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_11" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place12" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_12" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place13" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_13" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place14" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_14" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place15" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <ImageView fx:id="place_15" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                            </Pane>
+
+                                            <!-- Quatrième rangée de places (en bas à droite) -->
+                                            <Pane fx:id="section4" layoutX="500.0" layoutY="300.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                <!-- Lignes de démarcation des places -->
+                                                <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+
+                                                <!-- Places de parking -->
+                                                <Pane fx:id="place16" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_16" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place17" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_17" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place18" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_18" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place19" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                    <ImageView fx:id="place_19" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                                <Pane fx:id="place20" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                    <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    <ImageView fx:id="place_20" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                </Pane>
+                                            </Pane>
+                                            <Pane layoutX="454.0" layoutY="419.0">
+                                                <children>
+                                                    <Line endX="0.0" endY="-50.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                </children>
+                                            </Pane>
+                                            <Line endX="0.0" endY="-50.0" layoutX="444.0" layoutY="460.0" startX="10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                            <Line endX="0.0" endY="-50.0" layoutX="465.0" layoutY="459.0" startX="-10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                        </Pane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Motos">
+                    <content>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                            <children>
+                                <HBox alignment="CENTER" spacing="10.0">
+                                    <children>
+                                        <Label styleClass="label-subtitle" text="PLACES DISPONIBLES : " textAlignment="CENTER">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblPlacesMotos" styleClass="label-subtitle" text="15" textFill="#00a896">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label styleClass="label-subtitle" text=" / " textAlignment="CENTER">
+                                            <font>
+                                                <Font size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="lblPlacesTotalesMotos" styleClass="label-subtitle" text="20" textFill="#00a896">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" top="10.0" />
+                                    </padding>
+                                </HBox>
+                                <VBox prefHeight="612.0" prefWidth="1016.0">
+                                    <children>
+                                        <Pane fx:id="parkingPane1" prefHeight="550.0" prefWidth="900.0" styleClass="parkingContainer">
+                                            <children>
+                                                <Pane fx:id="section11" layoutX="50.0" layoutY="50.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                    <children>
+                                                        <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Pane fx:id="place11b" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_1" fitHeight="150.0" fitWidth="72.0" layoutX="-1.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place21" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_2" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place31" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_3" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place41" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_4" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place51" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <ImageView fx:id="placem_5" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                    </children>
+                                                </Pane>
+                                                <Pane fx:id="section21" layoutX="500.0" layoutY="50.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                    <children>
+                                                        <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Pane fx:id="place61" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_6" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place71" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_7" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place81" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_8" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place91" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_9" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place101" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <ImageView fx:id="placem_10" fitHeight="150.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                    </children>
+                                                </Pane>
+                                                <Pane layoutX="450.0" layoutY="125.0">
+                                                    <children>
+                                                        <Line endX="0.0" endY="-50.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="0.0" endY="-50.0" startX="-10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="0.0" endY="-50.0" startX="10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    </children>
+                                                </Pane>
+                                                <Pane fx:id="section31" layoutX="50.0" layoutY="300.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                    <children>
+                                                        <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Pane fx:id="place111" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_11" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place121" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_12" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place131" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_13" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place141" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_14" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place151" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <ImageView fx:id="placem_15" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                    </children>
+                                                </Pane>
+                                                <Pane fx:id="section41" layoutX="500.0" layoutY="300.0" prefHeight="150.0" prefWidth="350.0" styleClass="parking-section">
+                                                    <children>
+                                                        <Line endX="350.0" endY="0.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Line endX="350.0" endY="150.0" startX="0.0" startY="150.0" stroke="WHITE" strokeWidth="3.0" />
+                                                        <Pane fx:id="place161" layoutX="0.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="0.0" endY="150.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_16" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place171" layoutX="70.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_17" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place181" layoutX="140.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_18" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place191" layoutX="210.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="1.0" />
+                                                                <ImageView fx:id="placem_19" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                        <Pane fx:id="place201" layoutX="280.0" layoutY="0.0" prefHeight="150.0" prefWidth="70.0" styleClass="parking-spot">
+                                                            <children>
+                                                                <Line endX="70.0" endY="150.0" startX="70.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                                <ImageView fx:id="placem_20" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" />
+                                                            </children>
+                                                        </Pane>
+                                                    </children>
+                                                </Pane>
+                                                <Pane layoutX="454.0" layoutY="419.0">
+                                                    <children>
+                                                        <Line endX="0.0" endY="-50.0" startX="0.0" startY="0.0" stroke="WHITE" strokeWidth="3.0" />
+                                                    </children>
+                                                </Pane>
+                                                <Line endX="0.0" endY="-50.0" layoutX="444.0" layoutY="460.0" startX="10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                                <Line endX="0.0" endY="-50.0" layoutX="465.0" layoutY="459.0" startX="-10.0" startY="-40.0" stroke="WHITE" strokeWidth="3.0" />
+                                            </children>
+                                        </Pane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</AnchorPane>

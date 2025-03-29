@@ -42,8 +42,8 @@
     </GridPane>
 
     <HBox alignment="CENTER" spacing="10">
-        <Button fx:id="btnAjouter" onAction="#enregistrerVehicule" text="Ajouter" />
-        <Button fx:id="btnAnnuler" onAction="#annulerEnregistrement" text="Annuler" />
+        <Button fx:id="btnAjouter" onAction="#enregistrerVehicule" styleClass="button-primary" text="Ajouter" />
+        <Button fx:id="btnAnnuler" onAction="#annulerEnregistrement" styleClass="exit-button" text="Annuler" />
     </HBox>
 
 </VBox>
