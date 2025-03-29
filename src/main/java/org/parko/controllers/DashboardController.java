@@ -289,7 +289,7 @@ public class DashboardController implements Initializable {
             entrees.setName("Entrées");
 
             XYChart.Series<String, Number> revenus = new XYChart.Series<>();
-            revenus.setName("Revenus");
+            revenus.setName("Revenus (FCFA)"); // Ajout de l'unité monétaire pour clarifier
 
             // Déterminer l'échelle de temps appropriée en fonction de la période
             if (dateDebut.equals(dateFin)) {
@@ -297,13 +297,19 @@ public class DashboardController implements Initializable {
                 Map<String, Integer> entreesParHeure = statistiqueService.getEntreesParHeure(dateDebut, parkingId);
                 Map<String, Double> revenusParHeure = statistiqueService.getRevenusParHeure(dateDebut, parkingId);
 
+                // Déterminer les heures à afficher (uniquement celles avec activité)
+                boolean afficherToutesHeures = true; // Mettre à false pour n'afficher que les heures avec activité
+
                 for (int heure = 0; heure < 24; heure++) {
                     String heureStr = String.format("%02d:00", heure);
                     int nombreEntrees = entreesParHeure.getOrDefault(heureStr, 0);
-                    entrees.getData().add(new XYChart.Data<>(heureStr, nombreEntrees));
-
                     double revenusHeure = revenusParHeure.getOrDefault(heureStr, 0.0);
-                    revenus.getData().add(new XYChart.Data<>(heureStr, revenusHeure));
+
+                    // N'ajouter les heures que s'il y a des données ou si on veut tout afficher
+                    if (afficherToutesHeures || nombreEntrees > 0 || revenusHeure > 0) {
+                        entrees.getData().add(new XYChart.Data<>(heureStr, nombreEntrees));
+                        revenus.getData().add(new XYChart.Data<>(heureStr, revenusHeure));
+                    }
                 }
             } else {
                 // Pour des périodes plus longues, utiliser les données agrégées par jour
@@ -311,24 +317,75 @@ public class DashboardController implements Initializable {
                 Map<LocalDate, Double> revenusParJour = statistiqueService.getRevenusParJour(dateDebut, dateFin, parkingId);
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+
+                // Calculer l'intervalle approprié selon la durée de la période
+                long joursDifference = ChronoUnit.DAYS.between(dateDebut, dateFin);
+                int intervalle = determinerIntervalle(joursDifference);
+
                 for (LocalDate date = dateDebut; !date.isAfter(dateFin); date = date.plusDays(1)) {
-                    String dateStr = date.format(formatter);
+                    // N'afficher que les jours correspondant à l'intervalle pour les longues périodes
+                    if (joursDifference <= 31 || date.getDayOfMonth() % intervalle == 1) {
+                        String dateStr = date.format(formatter);
+                        int nombreEntrees = entreesParJour.getOrDefault(date, 0);
+                        entrees.getData().add(new XYChart.Data<>(dateStr, nombreEntrees));
 
-                    int nombreEntrees = entreesParJour.getOrDefault(date, 0);
-                    entrees.getData().add(new XYChart.Data<>(dateStr, nombreEntrees));
-
-                    double revenusJour = revenusParJour.getOrDefault(date, 0.0);
-                    revenus.getData().add(new XYChart.Data<>(dateStr, revenusJour));
+                        double revenusJour = revenusParJour.getOrDefault(date, 0.0);
+                        revenus.getData().add(new XYChart.Data<>(dateStr, revenusJour));
+                    }
                 }
             }
 
             // Ajouter les séries au graphique
             barChart.getData().add(entrees);
             barChart.getData().add(revenus);
+
+            // Appliquer un style différent pour chaque série
+            for (int i = 0; i < barChart.getData().size(); i++) {
+                XYChart.Series<String, Number> series = barChart.getData().get(i);
+                String color = i == 0 ? "#3498db" : "#e74c3c"; // Bleu pour entrées, rouge pour revenus
+
+                for (XYChart.Data<String, Number> data : series.getData()) {
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+                    } else {
+                        // Pour certaines versions de JavaFX, les nœuds peuvent ne pas être immédiatement disponibles
+                        Platform.runLater(() -> {
+                            if (data.getNode() != null) {
+                                data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+                            }
+                        });
+                    }
+
+                    // Ajouter un tooltip avec la valeur précise
+                    final XYChart.Data<String, Number> dataPoint = data;
+                    int finalI = i;
+                    data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                        if (newNode != null) {
+                            String tooltipText = finalI == 0 ?
+                                    dataPoint.getYValue() + " entrées" :
+                                    String.format("%,.0f FCFA", dataPoint.getYValue().doubleValue());
+
+                            Tooltip tooltip = new Tooltip(tooltipText);
+                            Tooltip.install(newNode, tooltip);
+                        }
+                    });
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Erreur lors de la mise à jour du graphique: " + e.getMessage());
         }
     }
+
+    // Méthode utilitaire pour déterminer l'intervalle d'affichage selon la durée
+    private int determinerIntervalle(long joursDifference) {
+        if (joursDifference <= 31) return 1;      // Afficher tous les jours (jusqu'à 1 mois)
+        if (joursDifference <= 92) return 3;      // Tous les 3 jours (1-3 mois)
+        if (joursDifference <= 183) return 7;     // Toutes les semaines (3-6 mois)
+        if (joursDifference <= 365) return 15;    // Tous les 15 jours (6 mois-1 an)
+        return 30;                               // Tous les mois (> 1 an)
+    }
+
     private void mettreAJourGraphiqueTypesVehicules() {
         try {
             // Vider le graphique

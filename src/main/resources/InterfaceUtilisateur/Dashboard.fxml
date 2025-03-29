@@ -275,7 +275,7 @@
                                                                 <CategoryAxis label="Heure" side="BOTTOM" />
                                                             </xAxis>
                                                             <yAxis>
-                                                                <NumberAxis label="Nombre d'entrées" side="LEFT" />
+                                                                <NumberAxis label="Révenus" side="LEFT" />
                                                             </yAxis>
                                                         </BarChart>
                                                     </children>

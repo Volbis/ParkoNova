@@ -147,24 +147,46 @@ public class StatistiqueService {
     }
 
     /* ========= LES REVENUS PAR PERIODES ============= */
-
     public double getRevenusTotauxPeriode(LocalDate dateDebut, LocalDate dateFin, int parkingId) {
-        /* Méthode à implémenter */
-        return 0;
+        double revenusTotaux = 0.0;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT SUM(montant) as totalRevenus " +
+                    "FROM EntreeSortie " +
+                    "WHERE DATE(dateSortie) BETWEEN ? AND ? " +
+                    "AND dateSortie IS NOT NULL " +
+                    "AND parkingId = ?")) {
+            
+            stmt.setDate(1, Date.valueOf(dateDebut));
+            stmt.setDate(2, Date.valueOf(dateFin));
+            stmt.setInt(3, parkingId);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                revenusTotaux = rs.getDouble("totalRevenus");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Erreur lors du calcul des revenus totaux: " + e.getMessage());
+        }
+        
+        return revenusTotaux;
     }
-    public Map<String, Double> getRevenusParHeure(LocalDate dateDebut, int parkingId ) {
+
+    public Map<String, Double> getRevenusParHeure(LocalDate dateDebut, int parkingId) {
         Map<String, Double> revenusParHeure = new HashMap<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT HOUR(dateEntree) as heure, SUM(montant) as revenus " +
-                             "FROM EntreeSortie " +
-                             "WHERE DATE(dateEntree) = ?  " +
-                             "GROUP BY HOUR(dateEntree) " +
-                             "ORDER BY heure")) {
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT HOUR(dateSortie) as heure, SUM(montant) as revenus " +
+                            "FROM EntreeSortie " +
+                            "WHERE DATE(dateSortie) = ? AND dateSortie IS NOT NULL " +  // Utiliser dateSortie au lieu de dateEntree
+                            "GROUP BY HOUR(dateSortie) " +
+                            "ORDER BY heure")) {
 
             stmt.setDate(1, Date.valueOf(dateDebut));
-            //stmt.setInt(2, parkingId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -179,7 +201,35 @@ public class StatistiqueService {
     }
 
     public Map<LocalDate, Double> getRevenusParJour(LocalDate dateDebut, LocalDate dateFin, int parkingId) {
-        /* Méthode à implémenter */
-        return null;
+        Map<LocalDate, Double> revenusParJour = new HashMap<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT DATE(dateSortie) as jour, SUM(montant) as revenus " +
+                            "FROM EntreeSortie " +
+                            "WHERE DATE(dateSortie) BETWEEN ? AND ? AND dateSortie IS NOT NULL " +
+                            "GROUP BY DATE(dateSortie) " +
+                            "ORDER BY jour")) {
+
+            stmt.setDate(1, Date.valueOf(dateDebut));
+            stmt.setDate(2, Date.valueOf(dateFin));
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("jour").toLocalDate();
+                revenusParJour.put(date, rs.getDouble("revenus"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Initialiser toutes les dates dans la période avec 0 pour éviter les valeurs null
+        for (LocalDate date = dateDebut; !date.isAfter(dateFin); date = date.plusDays(1)) {
+            if (!revenusParJour.containsKey(date)) {
+                revenusParJour.put(date, 0.0);
+            }
+        }
+
+        return revenusParJour;
     }
 }
