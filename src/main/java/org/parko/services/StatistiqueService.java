@@ -155,12 +155,10 @@ public class StatistiqueService {
                     "SELECT SUM(montant) as totalRevenus " +
                     "FROM EntreeSortie " +
                     "WHERE DATE(dateSortie) BETWEEN ? AND ? " +
-                    "AND dateSortie IS NOT NULL " +
-                    "AND parkingId = ?")) {
+                    "AND dateSortie IS NOT NULL ")) {
             
             stmt.setDate(1, Date.valueOf(dateDebut));
             stmt.setDate(2, Date.valueOf(dateFin));
-            stmt.setInt(3, parkingId);
             
             ResultSet rs = stmt.executeQuery();
             

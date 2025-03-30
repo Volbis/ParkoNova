@@ -700,6 +700,35 @@
     -fx-padding: 5px;
 }
 
+/* Styles pour les barres de progression */
+.progress-bar-container {
+    -fx-background-color: #e5e7eb;
+    -fx-background-radius: 4px;
+    -fx-min-height: 20px;
+}
+
+.progress-bar {
+    -fx-background-radius: 4px;
+    -fx-min-height: 20px;
+}
+
+#progressShortStay {
+    -fx-background-color: #3b82f6;
+}
+
+#progressMediumStay {
+    -fx-background-color: #22c55e;
+}
+
+#progressLongStay {
+    -fx-background-color: #eab308;
+}
+
+#progressVeryLongStay {
+    -fx-background-color: #ef4444;
+}
+
+
 /* ProgressIndicator */
 .progress-indicator {
     -fx-progress-color: -primary;
@@ -749,6 +778,40 @@
     -fx-border-width: 1px 0 0 0;
     -fx-border-color: -border-color;
 }
+
+/* Cards dashbord */
+.card_a{
+    -fx-background-color : #ffcb77;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+}
+
+.card_b{
+    -fx-background-color : #4cc9f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+}
+
+.card_c{
+    -fx-background-color : #00f5d4;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+}
+
+.card_d{
+    -fx-background-color : #d4c2fc;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+}
+eb5e28
 
 /* Action Tiles */
 .action-tile {

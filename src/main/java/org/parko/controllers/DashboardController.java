@@ -291,30 +291,34 @@ public class DashboardController implements Initializable {
             XYChart.Series<String, Number> revenus = new XYChart.Series<>();
             revenus.setName("Revenus (FCFA)"); // Ajout de l'unité monétaire pour clarifier
 
+            System.out.println("Préparation des données pour le graphique...");
+
             // Déterminer l'échelle de temps appropriée en fonction de la période
             if (dateDebut.equals(dateFin)) {
                 // Affichage par heure pour une journée
                 Map<String, Integer> entreesParHeure = statistiqueService.getEntreesParHeure(dateDebut, parkingId);
                 Map<String, Double> revenusParHeure = statistiqueService.getRevenusParHeure(dateDebut, parkingId);
 
-                // Déterminer les heures à afficher (uniquement celles avec activité)
-                boolean afficherToutesHeures = true; // Mettre à false pour n'afficher que les heures avec activité
+                System.out.println("Entrées par heure: " + entreesParHeure);
+                System.out.println("Revenus par heure: " + revenusParHeure);
 
+                // Ajouter toutes les heures, même celles sans données
                 for (int heure = 0; heure < 24; heure++) {
                     String heureStr = String.format("%02d:00", heure);
                     int nombreEntrees = entreesParHeure.getOrDefault(heureStr, 0);
                     double revenusHeure = revenusParHeure.getOrDefault(heureStr, 0.0);
 
-                    // N'ajouter les heures que s'il y a des données ou si on veut tout afficher
-                    if (afficherToutesHeures || nombreEntrees > 0 || revenusHeure > 0) {
-                        entrees.getData().add(new XYChart.Data<>(heureStr, nombreEntrees));
-                        revenus.getData().add(new XYChart.Data<>(heureStr, revenusHeure));
-                    }
+                    // Toujours ajouter des données, même à zéro
+                    entrees.getData().add(new XYChart.Data<>(heureStr, nombreEntrees));
+                    revenus.getData().add(new XYChart.Data<>(heureStr, revenusHeure));
                 }
             } else {
                 // Pour des périodes plus longues, utiliser les données agrégées par jour
                 Map<LocalDate, Integer> entreesParJour = statistiqueService.getEntreesParPeriode(dateDebut, dateFin);
                 Map<LocalDate, Double> revenusParJour = statistiqueService.getRevenusParJour(dateDebut, dateFin, parkingId);
+
+                System.out.println("Entrées par jour: " + entreesParJour);
+                System.out.println("Revenus par jour: " + revenusParJour);
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
 
@@ -327,50 +331,67 @@ public class DashboardController implements Initializable {
                     if (joursDifference <= 31 || date.getDayOfMonth() % intervalle == 1) {
                         String dateStr = date.format(formatter);
                         int nombreEntrees = entreesParJour.getOrDefault(date, 0);
-                        entrees.getData().add(new XYChart.Data<>(dateStr, nombreEntrees));
-
                         double revenusJour = revenusParJour.getOrDefault(date, 0.0);
+
+                        // Toujours ajouter des données, même à zéro
+                        entrees.getData().add(new XYChart.Data<>(dateStr, nombreEntrees));
                         revenus.getData().add(new XYChart.Data<>(dateStr, revenusJour));
                     }
                 }
             }
 
+            System.out.println("Entrées - Points de données: " + entrees.getData().size());
+            System.out.println("Revenus - Points de données: " + revenus.getData().size());
+
             // Ajouter les séries au graphique
-            barChart.getData().add(entrees);
-            barChart.getData().add(revenus);
+            barChart.getData().addAll(entrees, revenus);
+            System.out.println("Séries ajoutées au graphique: " + barChart.getData().size());
 
-            // Appliquer un style différent pour chaque série
-            for (int i = 0; i < barChart.getData().size(); i++) {
-                XYChart.Series<String, Number> series = barChart.getData().get(i);
-                String color = i == 0 ? "#3498db" : "#e74c3c"; // Bleu pour entrées, rouge pour revenus
+            // Forcer le rendu du graphique
+            barChart.layout();
+            barChart.applyCss();
 
-                for (XYChart.Data<String, Number> data : series.getData()) {
-                    if (data.getNode() != null) {
-                        data.getNode().setStyle("-fx-bar-fill: " + color + ";");
-                    } else {
-                        // Pour certaines versions de JavaFX, les nœuds peuvent ne pas être immédiatement disponibles
-                        Platform.runLater(() -> {
-                            if (data.getNode() != null) {
-                                data.getNode().setStyle("-fx-bar-fill: " + color + ";");
-                            }
-                        });
-                    }
+            // Appliquer un style différent pour chaque série avec un délai pour s'assurer que les nœuds sont créés
+            Platform.runLater(() -> {
+                for (int i = 0; i < barChart.getData().size(); i++) {
+                    XYChart.Series<String, Number> series = barChart.getData().get(i);
+                    final String color = i == 0 ? "#3498db" : "#e74c3c"; // Bleu pour entrées, rouge pour revenus
+                    final int seriesIndex = i;
 
-                    // Ajouter un tooltip avec la valeur précise
-                    final XYChart.Data<String, Number> dataPoint = data;
-                    int finalI = i;
-                    data.nodeProperty().addListener((obs, oldNode, newNode) -> {
-                        if (newNode != null) {
-                            String tooltipText = finalI == 0 ?
-                                    dataPoint.getYValue() + " entrées" :
-                                    String.format("%,.0f FCFA", dataPoint.getYValue().doubleValue());
+                    System.out.println("Application du style à la série " + (i+1) + " (" + series.getName() + ")");
+
+                    for (XYChart.Data<String, Number> data : series.getData()) {
+                        if (data.getNode() != null) {
+                            data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+
+                            // Ajouter un tooltip
+                            String tooltipText = seriesIndex == 0 ?
+                                    data.getYValue() + " entrées" :
+                                    String.format("%,.0f FCFA", data.getYValue().doubleValue());
 
                             Tooltip tooltip = new Tooltip(tooltipText);
-                            Tooltip.install(newNode, tooltip);
+                            Tooltip.install(data.getNode(), tooltip);
+                        } else {
+                            System.out.println("Nœud non disponible pour un point de données");
                         }
-                    });
+                    }
                 }
-            }
+            });
+
+            // Vérification supplémentaire après l'application des styles
+            Platform.runLater(() -> {
+                System.out.println("Vérification post-rendu - Nombre de séries: " + barChart.getData().size());
+                for (XYChart.Series<String, Number> serie : barChart.getData()) {
+                    System.out.println("Série: " + serie.getName() + " - " + serie.getData().size() + " points");
+
+                    // Vérifier si les nœuds sont bien créés
+                    int nodesCount = 0;
+                    for (XYChart.Data<String, Number> data : serie.getData()) {
+                        if (data.getNode() != null) nodesCount++;
+                    }
+                    System.out.println("  Nœuds disponibles: " + nodesCount + "/" + serie.getData().size());
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Erreur lors de la mise à jour du graphique: " + e.getMessage());
