@@ -25,7 +25,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1050.0" prefWidth="962.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.DashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1079.0" prefWidth="962.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.DashboardController">
     <top>
         <HBox id="mainHeader" fx:id="mainHeader" alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
             <children>
@@ -240,14 +240,14 @@
                                         </VBox>
                                     </children>
                                 </HBox>
-                                <HBox spacing="20.0">
+                                <HBox prefHeight="326.0" prefWidth="912.0" spacing="20.0">
                                     <children>
                                         <VBox spacing="10.0" HBox.hgrow="SOMETIMES">
                                             <children>
                                     <PieChart fx:id="vehiculeTypeChart" prefHeight="380.0" prefWidth="532.0" title="Occupation du parking" />
                                             </children>
                                         </VBox>
-                                        <VBox spacing="10.0" HBox.hgrow="SOMETIMES">
+                                        <VBox fx:id="alertesSys" prefHeight="312.0" prefWidth="362.0" spacing="10.0" HBox.hgrow="SOMETIMES">
                                             <children>
                                                 <HBox styleClass="panel-header">
                                                     <children>
@@ -264,7 +264,6 @@
                                                                     <children>
                                                                         <Label styleClass="panel-title" text="Durées de stationnement" />
                                                                         <Region HBox.hgrow="ALWAYS" />
-                                                                        <Button fx:id="btnExporterDurees" mnemonicParsing="false" styleClass="link-button" text="Exporter" />
                                                                     </children>
                                                                 </HBox>
                                                                 <StackPane styleClass="panel-content">
@@ -282,7 +281,39 @@
                                                                                         <Label fx:id="lblShortStayPercentage" text="65%" />
                                                                                     </children>
                                                                                 </HBox>
-                                                                                <!-- Répéter pour d'autres durées -->
+                                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                                    <children>
+                                                                                        <Label minWidth="100.0" text="1 - 3 heures" />
+                                                                                        <StackPane styleClass="progress-bar-container" HBox.hgrow="ALWAYS">
+                                                                                            <children>
+                                                                                                <Region fx:id="progressMediumStay" maxWidth="0.25" styleClass="progress-bar" />
+                                                                                            </children>
+                                                                                        </StackPane>
+                                                                                        <Label fx:id="lblMediumStayPercentage" text="25%" />
+                                                                                    </children>
+                                                                                </HBox>
+                                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                                    <children>
+                                                                                        <Label minWidth="100.0" text="3 - 6 heures" />
+                                                                                        <StackPane styleClass="progress-bar-container" HBox.hgrow="ALWAYS">
+                                                                                            <children>
+                                                                                                <Region fx:id="progressLongStay" maxWidth="0.08" styleClass="progress-bar" />
+                                                                                            </children>
+                                                                                        </StackPane>
+                                                                                        <Label fx:id="lblLongStayPercentage" text="8%" />
+                                                                                    </children>
+                                                                                </HBox>
+                                                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                                                    <children>
+                                                                                        <Label minWidth="100.0" text="&gt; 6 heures" />
+                                                                                        <StackPane styleClass="progress-bar-container" HBox.hgrow="ALWAYS">
+                                                                                            <children>
+                                                                                                <Region fx:id="progressExtendedStay" maxWidth="0.02" styleClass="progress-bar" />
+                                                                                            </children>
+                                                                                        </StackPane>
+                                                                                        <Label fx:id="lblExtendedStayPercentage" text="2%" />
+                                                                                    </children>
+                                                                                </HBox>
                                                                             </children>
                                                                         </VBox>
                                                                     </children>

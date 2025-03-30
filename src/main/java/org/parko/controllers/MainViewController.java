@@ -123,8 +123,10 @@ public class MainViewController {
         }
         else if (event.getSource() == btnParametres) {
             loadView("/InterfaceUtilisateur/Parametres.fxml");
-            mainHeader.setVisible(false);
-            mainHeader.setManaged(false);
+             if (mainHeader != null) {
+                mainHeader.setVisible(true);
+                mainHeader.setManaged(true);
+            }
 
             // Ajout de la couleur au btn
             // Remove selected style from previously selected button
@@ -138,8 +140,10 @@ public class MainViewController {
         }
         else if (event.getSource() == btnStatistiques) {
             loadView("/InterfaceUtilisateur/Statistiques.fxml");
-            mainHeader.setVisible(false);
-            mainHeader.setManaged(false);
+             if (mainHeader != null) {
+                mainHeader.setVisible(true);
+                mainHeader.setManaged(true);
+            }
 
             // Ajout de la couleur au btn
             // Remove selected style from previously selected button
@@ -250,9 +254,18 @@ public class MainViewController {
         comparisonChart.getData().add(barSeries);
     }
 */
-    private void loadView(String fxml) {
+private void loadView(String fxml) {
+    try {
+        // Vérifier si le fichier existe
+        java.net.URL fxmlUrl = getClass().getResource(fxml);
+        if (fxmlUrl == null) {
+            System.err.println("ERREUR: Fichier FXML non trouvé: " + fxml);
+            showErrorAlert("Fichier non trouvé", "Le fichier " + fxml + " n'existe pas.");
+            return;
+        }
+
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
         try {
-            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(fxml)));
             Parent root = loader.load();
 
             // Configuration du ScrollPane pour qu'il s'adapte
@@ -262,8 +275,24 @@ public class MainViewController {
             // Chargement du contenu
             contentScrollPane.setContent(root);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("ERREUR lors du chargement du fichier " + fxml + ": " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Cause: " + e.getCause().getMessage());
+                e.getCause().printStackTrace();
+            }
+            throw e;
         }
+    } catch (IOException e) {
+        e.printStackTrace();
+        showErrorAlert("Erreur de chargement", "Impossible de charger " + fxml + "\nErreur: " + e.getMessage() +
+                (e.getCause() != null ? "\nCause: " + e.getCause().getMessage() : ""));
     }
-
+}
+    private void showErrorAlert(String title, String content) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }

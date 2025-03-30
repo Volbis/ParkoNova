@@ -29,7 +29,7 @@ public class StatistiquesController implements Initializable {
     @FXML private Label durationComparison;
 
     @FXML private LineChart<String, Number> timeSeriesChart;
-    @FXML private PieChart distributionChart;
+    @FXML private AreaChart<String, Number> AreaChart;
 
 
     @FXML private TableView<StatistiqueEntry> detailedDataTable;
@@ -167,28 +167,207 @@ public class StatistiquesController implements Initializable {
      * Configure les graphiques avec des données d'exemple
      */
     private void configureCharts() {
-        // Configuration du graphique linéaire
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Taux d'occupation");
-        series.getData().add(new XYChart.Data<>("8h", 25));
-        series.getData().add(new XYChart.Data<>("10h", 45));
-        series.getData().add(new XYChart.Data<>("12h", 70));
-        series.getData().add(new XYChart.Data<>("14h", 60));
-        series.getData().add(new XYChart.Data<>("16h", 80));
-        series.getData().add(new XYChart.Data<>("18h", 55));
-        series.getData().add(new XYChart.Data<>("20h", 30));
-        timeSeriesChart.getData().add(series);
+        // Configuration du graphique linéaire existant
+        if (timeSeriesChart != null) {
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Taux d'occupation");
+            series.getData().add(new XYChart.Data<>("8h", 25));
+            series.getData().add(new XYChart.Data<>("10h", 45));
+            series.getData().add(new XYChart.Data<>("12h", 70));
+            series.getData().add(new XYChart.Data<>("14h", 60));
+            series.getData().add(new XYChart.Data<>("16h", 80));
+            series.getData().add(new XYChart.Data<>("18h", 55));
+            series.getData().add(new XYChart.Data<>("20h", 30));
+            timeSeriesChart.getData().add(series);
+        }
 
-        // Configuration du graphique circulaire
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-                new PieChart.Data("Standard", 60),
-                new PieChart.Data("Handicapé", 5),
-                new PieChart.Data("Famille", 15),
-                new PieChart.Data("Électrique", 20)
-        );
-        distributionChart.setData(pieChartData);
+        // Configuration du nouveau AreaChart
+        if (AreaChart != null) {
+            // Série pour les voitures
+            XYChart.Series<String, Number> voituresSeries = new XYChart.Series<>();
+            voituresSeries.setName("Voitures");
+            voituresSeries.getData().add(new XYChart.Data<>("Lundi", 120));
+            voituresSeries.getData().add(new XYChart.Data<>("Mardi", 135));
+            voituresSeries.getData().add(new XYChart.Data<>("Mercredi", 115));
+            voituresSeries.getData().add(new XYChart.Data<>("Jeudi", 145));
+            voituresSeries.getData().add(new XYChart.Data<>("Vendredi", 170));
+            voituresSeries.getData().add(new XYChart.Data<>("Samedi", 210));
+            voituresSeries.getData().add(new XYChart.Data<>("Dimanche", 90));
 
+            // Série pour les motos
+            XYChart.Series<String, Number> motosSeries = new XYChart.Series<>();
+            motosSeries.setName("Motos");
+            motosSeries.getData().add(new XYChart.Data<>("Lundi", 35));
+            motosSeries.getData().add(new XYChart.Data<>("Mardi", 45));
+            motosSeries.getData().add(new XYChart.Data<>("Mercredi", 30));
+            motosSeries.getData().add(new XYChart.Data<>("Jeudi", 40));
+            motosSeries.getData().add(new XYChart.Data<>("Vendredi", 55));
+            motosSeries.getData().add(new XYChart.Data<>("Samedi", 70));
+            motosSeries.getData().add(new XYChart.Data<>("Dimanche", 25));
+
+            // Ajout des séries au graphique
+            AreaChart.getData().addAll(voituresSeries, motosSeries);
+            
+            // Style et configuration du graphique
+            AreaChart.setTitle("Stationnements par jour de la semaine");
+            AreaChart.setCreateSymbols(true); // Affiche les points sur le graphique
+            
+            // Application de styles CSS personnalisés pour les séries
+            applyAreaChartStyles();
+        }
     }
+
+    private void applyAreaChartStyles() {
+        // Vérifier que le graphique existe
+        if (AreaChart == null || AreaChart.getData().isEmpty()) return;
+        
+        // Styles pour la première série (voitures)
+        String voituresStyle = 
+            "-fx-stroke: #1f77b4; " +
+            "-fx-fill: linear-gradient(to bottom, rgba(31, 119, 180, 0.6), rgba(31, 119, 180, 0.1));";
+        
+        // Styles pour la deuxième série (motos)
+        String motosStyle = 
+            "-fx-stroke: #ff7f0e; " +
+            "-fx-fill: linear-gradient(to bottom, rgba(255, 127, 14, 0.6), rgba(255, 127, 14, 0.1));";
+        
+        // Application des styles
+        AreaChart.getData().get(0).getNode().setStyle(voituresStyle);
+        AreaChart.getData().get(1).getNode().setStyle(motosStyle);
+        
+        // Amélioration des points de données
+        for (int i = 0; i < AreaChart.getData().size(); i++) {
+            XYChart.Series<String, Number> series = AreaChart.getData().get(i);
+            String color = (i == 0) ? "#1f77b4" : "#ff7f0e";
+            
+            // Appliquer le style à chaque point de données
+            for (XYChart.Data<String, Number> item : series.getData()) {
+                if (item.getNode() != null) {
+                    item.getNode().setStyle(
+                        "-fx-background-color: " + color + ", white; " +
+                        "-fx-background-insets: 0, 2; " +
+                        "-fx-background-radius: 5px; " +
+                        "-fx-padding: 5px;"
+                    );
+                }
+            }
+        }
+    }
+
+    private void updateAreaChartData(String period, String type) {
+        if (AreaChart == null) return;
+        
+        // Effacer les données existantes
+        AreaChart.getData().clear();
+        
+        // Créer de nouvelles séries selon la période sélectionnée
+        XYChart.Series<String, Number> voituresSeries = new XYChart.Series<>();
+        voituresSeries.setName("Voitures");
+        
+        XYChart.Series<String, Number> motosSeries = new XYChart.Series<>();
+        motosSeries.setName("Motos");
+        
+        // Ajuster les données selon la période sélectionnée
+        switch (period) {
+            case "Aujourd'hui":
+                // Pour une journée, on affiche les heures au lieu des jours
+                voituresSeries.getData().add(new XYChart.Data<>("8h", 45));
+                voituresSeries.getData().add(new XYChart.Data<>("10h", 70));
+                voituresSeries.getData().add(new XYChart.Data<>("12h", 90));
+                voituresSeries.getData().add(new XYChart.Data<>("14h", 65));
+                voituresSeries.getData().add(new XYChart.Data<>("16h", 85));
+                voituresSeries.getData().add(new XYChart.Data<>("18h", 110));
+                voituresSeries.getData().add(new XYChart.Data<>("20h", 50));
+                
+                motosSeries.getData().add(new XYChart.Data<>("8h", 15));
+                motosSeries.getData().add(new XYChart.Data<>("10h", 20));
+                motosSeries.getData().add(new XYChart.Data<>("12h", 25));
+                motosSeries.getData().add(new XYChart.Data<>("14h", 18));
+                motosSeries.getData().add(new XYChart.Data<>("16h", 22));
+                motosSeries.getData().add(new XYChart.Data<>("18h", 30));
+                motosSeries.getData().add(new XYChart.Data<>("20h", 12));
+                break;
+                
+            case "Cette semaine":
+                // Données pour la semaine (par défaut)
+                voituresSeries.getData().add(new XYChart.Data<>("Lundi", 120));
+                voituresSeries.getData().add(new XYChart.Data<>("Mardi", 135));
+                voituresSeries.getData().add(new XYChart.Data<>("Mercredi", 115));
+                voituresSeries.getData().add(new XYChart.Data<>("Jeudi", 145));
+                voituresSeries.getData().add(new XYChart.Data<>("Vendredi", 170));
+                voituresSeries.getData().add(new XYChart.Data<>("Samedi", 210));
+                voituresSeries.getData().add(new XYChart.Data<>("Dimanche", 90));
+                
+                motosSeries.getData().add(new XYChart.Data<>("Lundi", 35));
+                motosSeries.getData().add(new XYChart.Data<>("Mardi", 45));
+                motosSeries.getData().add(new XYChart.Data<>("Mercredi", 30));
+                motosSeries.getData().add(new XYChart.Data<>("Jeudi", 40));
+                motosSeries.getData().add(new XYChart.Data<>("Vendredi", 55));
+                motosSeries.getData().add(new XYChart.Data<>("Samedi", 70));
+                motosSeries.getData().add(new XYChart.Data<>("Dimanche", 25));
+                break;
+                
+            case "Ce mois":
+                // Données simplifiées pour le mois (semaines)
+                voituresSeries.getData().add(new XYChart.Data<>("Semaine 1", 680));
+                voituresSeries.getData().add(new XYChart.Data<>("Semaine 2", 720));
+                voituresSeries.getData().add(new XYChart.Data<>("Semaine 3", 750));
+                voituresSeries.getData().add(new XYChart.Data<>("Semaine 4", 840));
+                
+                motosSeries.getData().add(new XYChart.Data<>("Semaine 1", 210));
+                motosSeries.getData().add(new XYChart.Data<>("Semaine 2", 230));
+                motosSeries.getData().add(new XYChart.Data<>("Semaine 3", 245));
+                motosSeries.getData().add(new XYChart.Data<>("Semaine 4", 270));
+                break;
+                
+            case "Cette année":
+                // Données pour l'année (mois)
+                voituresSeries.getData().add(new XYChart.Data<>("Jan", 2800));
+                voituresSeries.getData().add(new XYChart.Data<>("Fév", 2600));
+                voituresSeries.getData().add(new XYChart.Data<>("Mar", 3100));
+                voituresSeries.getData().add(new XYChart.Data<>("Avr", 3300));
+                voituresSeries.getData().add(new XYChart.Data<>("Mai", 3500));
+                voituresSeries.getData().add(new XYChart.Data<>("Juin", 3800));
+                voituresSeries.getData().add(new XYChart.Data<>("Juil", 4200));
+                voituresSeries.getData().add(new XYChart.Data<>("Août", 4400));
+                voituresSeries.getData().add(new XYChart.Data<>("Sep", 3900));
+                voituresSeries.getData().add(new XYChart.Data<>("Oct", 3600));
+                voituresSeries.getData().add(new XYChart.Data<>("Nov", 3200));
+                voituresSeries.getData().add(new XYChart.Data<>("Déc", 3500));
+                
+                motosSeries.getData().add(new XYChart.Data<>("Jan", 850));
+                motosSeries.getData().add(new XYChart.Data<>("Fév", 780));
+                motosSeries.getData().add(new XYChart.Data<>("Mar", 930));
+                motosSeries.getData().add(new XYChart.Data<>("Avr", 990));
+                motosSeries.getData().add(new XYChart.Data<>("Mai", 1050));
+                motosSeries.getData().add(new XYChart.Data<>("Juin", 1140));
+                motosSeries.getData().add(new XYChart.Data<>("Juil", 1260));
+                motosSeries.getData().add(new XYChart.Data<>("Août", 1320));
+                motosSeries.getData().add(new XYChart.Data<>("Sep", 1170));
+                motosSeries.getData().add(new XYChart.Data<>("Oct", 1080));
+                motosSeries.getData().add(new XYChart.Data<>("Nov", 960));
+                motosSeries.getData().add(new XYChart.Data<>("Déc", 1050));
+                break;
+        }
+        
+        // Ajouter les séries au graphique
+        AreaChart.getData().addAll(voituresSeries, motosSeries);
+        
+        // Mettre à jour le titre selon le type de données sélectionné
+        if ("Occupation".equals(type)) {
+            AreaChart.setTitle("Occupation par véhicule - " + period);
+        } else if ("Revenus".equals(type)) {
+            AreaChart.setTitle("Revenus par véhicule - " + period);
+        } else if ("Durée".equals(type)) {
+            AreaChart.setTitle("Durée de stationnement - " + period);
+        } else {
+            AreaChart.setTitle("Stationnements par type de véhicule - " + period);
+        }
+        
+        // Appliquer les styles CSS personnalisés
+        applyAreaChartStyles();
+    }
+
 
     /**
      * Configure le tableau de données détaillées avec des données d'exemple
@@ -249,7 +428,9 @@ public class StatistiquesController implements Initializable {
                 revenueChange.setText("+25% vs année dernière");
                 break;
         }
+        updateAreaChartData(period, type);
     }
+    
 
     /**
      * Affiche une boîte de dialogue d'erreur
@@ -290,4 +471,7 @@ public class StatistiquesController implements Initializable {
         public javafx.beans.property.StringProperty avgDurationProperty() { return avgDuration; }
         public javafx.beans.property.StringProperty notesProperty() { return notes; }
     }
+
+
+
 }

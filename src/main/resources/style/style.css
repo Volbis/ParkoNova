@@ -811,7 +811,6 @@
     -fx-padding: 15px;
     -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
 }
-eb5e28
 
 /* Action Tiles */
 .action-tile {

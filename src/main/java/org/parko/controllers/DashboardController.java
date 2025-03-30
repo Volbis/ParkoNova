@@ -9,6 +9,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+
 //import org.parko.model.Abonnement;
 import org.parko.classes.Vehicule;
 import org.parko.services.ParkingService;
@@ -17,6 +21,7 @@ import org.parko.services.VehiculeService;
 //import org.parko.util.ParkingEventListener;
 //import org.parko.util.ParkingEventManager;
 
+import javafx.scene.layout.Region;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
@@ -42,7 +47,18 @@ public class DashboardController implements Initializable {
     @FXML private BarChart<String, Number> barChart;
     @FXML private PieChart vehiculeTypeChart;
 
-    // ID du parking actuel (à récupérer depuis la configuration ou la session)
+
+    // Elements pour la progress Bar
+    @FXML private Region progressShortStay;
+    @FXML private Region progressMediumStay;
+    @FXML private Region progressLongStay;
+    @FXML private Region progressExtendedStay;
+
+    @FXML private Label lblShortStayPercentage;
+    @FXML private Label lblMediumStayPercentage;
+    @FXML private Label lblLongStayPercentage;
+    @FXML private Label lblExtendedStayPercentage;
+
     private int parkingId = 1; // Par défaut
 
     // Services contenant les procédures stockés de la bd
@@ -204,12 +220,62 @@ public class DashboardController implements Initializable {
         mettreAJourVehiculesPresents();
         mettreAJourRevenus(dateDebut, dateFin);
         mettreAJourTauxOccupation();
-
         // Mise à jour du graphique des types de véhicules
         mettreAJourGraphiqueTypesVehicules();
-
         // Mise à jour des graphiques
         mettreAJourGraphiqueActivite(dateDebut, dateFin);
+        // Mise à jour des pourcentages de stationnement
+        mettreAJourStatistiquesStationnement(dateDebut, dateFin);
+    }
+
+    private void mettreAJourStatistiquesStationnement(LocalDate dateDebut, LocalDate dateFin) {
+        try {
+            // Récupérer les statistiques de durée de stationnement depuis le service
+            Map<String, Integer> dureeStationnement = statistiqueService.getDureeStationnement(dateDebut, dateFin, parkingId);
+            
+            // Récupérer les valeurs pour chaque catégorie
+            int moinsUneHeure = dureeStationnement.getOrDefault("< 1 heure", 0);
+            int entreUneTroisHeures = dureeStationnement.getOrDefault("1 - 3 heures", 0);
+            int entreTroisSixHeures = dureeStationnement.getOrDefault("3 - 6 heures", 0);
+            int plusSixHeures = dureeStationnement.getOrDefault("> 6 heures", 0);
+            
+            // Calculer le total
+            int total = moinsUneHeure + entreUneTroisHeures + entreTroisSixHeures + plusSixHeures;
+            
+            if (total > 0) {
+                // Calculer les pourcentages
+                double pctMoinsUneHeure = (double) moinsUneHeure / total;
+                double pctEntreUneTroisHeures = (double) entreUneTroisHeures / total;
+                double pctEntreTroisSixHeures = (double) entreTroisSixHeures / total;
+                double pctPlusSixHeures = (double) plusSixHeures / total;
+                
+                // Mettre à jour les progress bars
+                progressShortStay.setMaxWidth(pctMoinsUneHeure);
+                progressMediumStay.setMaxWidth(pctEntreUneTroisHeures);
+                progressLongStay.setMaxWidth(pctEntreTroisSixHeures);
+                progressExtendedStay.setMaxWidth(pctPlusSixHeures);
+                
+                // Mettre à jour les labels de pourcentage
+                lblShortStayPercentage.setText(String.format("%.0f%%", pctMoinsUneHeure * 100));
+                lblMediumStayPercentage.setText(String.format("%.0f%%", pctEntreUneTroisHeures * 100));
+                lblLongStayPercentage.setText(String.format("%.0f%%", pctEntreTroisSixHeures * 100));
+                lblExtendedStayPercentage.setText(String.format("%.0f%%", pctPlusSixHeures * 100));
+            } else {
+                // Cas où il n'y a pas de données - afficher 0%
+                progressShortStay.setMaxWidth(0);
+                progressMediumStay.setMaxWidth(0);
+                progressLongStay.setMaxWidth(0);
+                progressExtendedStay.setMaxWidth(0);
+                
+                lblShortStayPercentage.setText("0%");
+                lblMediumStayPercentage.setText("0%");
+                lblLongStayPercentage.setText("0%");
+                lblExtendedStayPercentage.setText("0%");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Erreur lors de la mise à jour des statistiques de stationnement: " + e.getMessage());
+        }
     }
 
     private void mettreAJourPlacesDisponibles() {
@@ -433,33 +499,62 @@ public class DashboardController implements Initializable {
                 }
             }
             
-            // Ajouter des couleurs personnalisées (optionnel)
-            int colorIndex = 0;
-            String[] colors = {"#3498db", "#e74c3c", "#2ecc71", "#f1c40f", "#9b59b6"};
-            
-            for (PieChart.Data data : vehiculeTypeChart.getData()) {
-                String color = colors[colorIndex % colors.length];
-                data.getNode().setStyle("-fx-pie-color: " + color + ";");
-                colorIndex++;
-            }
+            // Tableau de couleurs personnalisées
+            String[] colors = {"#3b82f6", "#ff2424"};
             
             int total = vehiculesParType.values().stream().mapToInt(Integer::intValue).sum();
-            // Ajouter des tooltips montrant le pourcentage
-            for (PieChart.Data data : vehiculeTypeChart.getData()) {
-                data.nodeProperty().addListener((obs, oldNode, newNode) -> {
-                    if (newNode != null) {
+            
+
+            Platform.runLater(() -> {
+                // Mettre à jour les couleurs et ajouter des tooltips
+                int colorIndex = 0;
+                for (PieChart.Data data : vehiculeTypeChart.getData()) {
+                    String color = colors[colorIndex % colors.length];
+                    
+                    // Mettre à jour la couleur de la section
+                    if (data.getNode() != null) {
+                        data.getNode().setStyle("-fx-pie-color: " + color + ";");
+                        
+                        // Ajouter le tooltip
                         double percentage = (double) data.getPieValue() / total * 100;
                         String text = String.format("%.1f%%", percentage);
-                        
                         Tooltip tooltip = new Tooltip(text);
-                        Tooltip.install(newNode, tooltip);
+                        Tooltip.install(data.getNode(), tooltip);
                     }
-                });
-            }
+                    
+                    // Mettre à jour la légende correspondante
+                    updateLegendColor(vehiculeTypeChart, data.getName(), color);
+                    
+                    colorIndex++;
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Erreur lors de la mise à jour du graphique des types de véhicules: " + e.getMessage());
         }
-}
+    }
+
+    // Méthode utilitaire pour mettre à jour la couleur d'un élément de légende
+    private void updateLegendColor(PieChart chart, String itemName, String color) {
+        // Accéder à la légende du graphique
+        for (Node node : chart.lookupAll(".chart-legend-item")) {
+            if (node instanceof Label) {
+                Label label = (Label) node;
+                if (label.getText().equals(itemName)) {
+                    // Trouver le symbole de la légende (généralement le premier enfant du parent)
+                    Node parent = label.getParent();
+                    if (parent != null) {
+                        for (Node sibling : parent.lookupAll(".chart-legend-item-symbol")) {
+                            // Mettre à jour la couleur du symbole de légende
+                            sibling.setStyle("-fx-background-color: " + color + ";");
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
 
 /*

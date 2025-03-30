@@ -230,4 +230,39 @@ public class StatistiqueService {
 
         return revenusParJour;
     }
+
+    // DUREE MOYENNE DE STATIONNEMENT
+    public Map<String, Integer> getDureeStationnement(LocalDate dateDebut, LocalDate dateFin, int parkingId) {
+        Map<String, Integer> dureeStationnement = new HashMap<>();
+        
+        // Initialiser toutes les catégories à 0
+        dureeStationnement.put("< 1 heure", 0);
+        dureeStationnement.put("1 - 3 heures", 0);
+        dureeStationnement.put("3 - 6 heures", 0);
+        dureeStationnement.put("> 6 heures", 0);
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+            CallableStatement stmt = conn.prepareCall("{CALL getDureeStationnement(?, ?, ?)}")) {
+            
+            stmt.setDate(1, Date.valueOf(dateDebut));
+            stmt.setDate(2, Date.valueOf(dateFin));
+            stmt.setInt(3, parkingId);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String categorie = rs.getString("categorie");
+                int nombre = rs.getInt("nombre");
+                
+                // Mettre à jour la catégorie correspondante
+                dureeStationnement.put(categorie, nombre);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return dureeStationnement;
+    }
+
 }

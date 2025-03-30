@@ -3,11 +3,9 @@
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.AreaChart?>
 <?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -17,149 +15,159 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.StatistiquesController">
-    <content>
-        <VBox prefHeight="636.0" prefWidth="965.0" spacing="15">
-
-            <padding>
-                <Insets bottom="20" left="20" right="20" top="20" />
-            </padding>
-
-            <!-- Titre principal -->
-            <HBox alignment="CENTER" style="-fx-background-color: #f0f0f0; -fx-background-radius: 5;">
-                <padding>
-                    <Insets bottom="10" left="10" right="10" top="10" />
-                </padding>
-                <Text style="-fx-font-weight: bold;" text="Tableau de bord des statistiques">
-                    <font>
-                        <Font size="24.0" />
-                    </font>
-                </Text>
-            </HBox>
-
-            <!-- Filtres et contrôles -->
-            <HBox alignment="CENTER_LEFT" minHeight="-Infinity" spacing="10">
-                <Label text="Période:" />
-                <ComboBox fx:id="periodComboBox" promptText="Sélectionner une période">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Aujourd'hui" />
-                            <String fx:value="Cette semaine" />
-                            <String fx:value="Ce mois" />
-                            <String fx:value="Cette année" />
-                        </FXCollections>
-                    </items>
-                </ComboBox>
-
-                <Label text="Type:" />
-                <ComboBox fx:id="typeComboBox" promptText="Type de données">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="Occupation" />
-                            <String fx:value="Revenus" />
-                            <String fx:value="Durée moyenne" />
-                        </FXCollections>
-                    </items>
-                </ComboBox>
-
-                <Button fx:id="refreshButton" onAction="#handleRefreshAction" styleClass="primary-button" text="Actualiser" />
-
-                <HBox.margin>
-                    <Insets bottom="5" top="5" />
-                </HBox.margin>
-            </HBox>
-
-            <!-- Statistiques principales en cartes -->
-            <HBox alignment="CENTER" minHeight="-Infinity" spacing="20">
-                <VBox style="-fx-background-color: #e6f7ff; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                    <Label styleClass="card-title" text="Places occupées" />
-                    <Text fx:id="occupiedSpotsText" styleClass="card-value" text="67%">
-                        <font>
-                            <Font size="24.0" />
-                        </font>
-                    </Text>
-                    <Label fx:id="occupiedSpotsDetails" styleClass="card-details" text="134/200 places" />
-                </VBox>
-
-                <VBox style="-fx-background-color: #e6ffe6; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                    <Label styleClass="card-title" text="Revenus du jour" />
-                    <Text fx:id="dailyRevenueText" styleClass="card-value" text="1 250 €">
-                        <font>
-                            <Font size="24.0" />
-                        </font>
-                    </Text>
-                    <Label fx:id="revenueChange" styleClass="card-details" text="+12% vs hier" />
-                </VBox>
-
-                <VBox style="-fx-background-color: #fff5e6; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
-                    <Label styleClass="card-title" text="Durée moy. stationnement" />
-                    <Text fx:id="avgParkingDurationText" styleClass="card-value" text="2h 45min">
-                        <font>
-                            <Font size="24.0" />
-                        </font>
-                    </Text>
-                    <Label fx:id="durationComparison" styleClass="card-details" text="-5% vs moyenne" />
-                </VBox>
-
-                <HBox.margin>
-                    <Insets bottom="5" top="5" />
-                </HBox.margin>
-            </HBox>
-
-            <!-- Graphiques -->
-            <TabPane VBox.vgrow="ALWAYS">
-                <tabs>
-                    <Tab text="Évolution temporelle">
-                        <LineChart fx:id="timeSeriesChart" animated="true" legendVisible="true" title="Évolution de l'occupation">
-                            <xAxis>
-                                <CategoryAxis animated="false" label="Heure" />
-                            </xAxis>
-                            <yAxis>
-                                <NumberAxis animated="false" label="Taux d'occupation (%)" />
-                            </yAxis>
-                        </LineChart>
-                    </Tab>
-
-                    <Tab text="Distribution">
-                        <PieChart fx:id="distributionChart" animated="true" legendVisible="true" title="Distribution par type de place" />
-                    </Tab>
-
-                </tabs>
-            </TabPane>
-
-            <!-- Tableau de données détaillées -->
-            <VBox VBox.vgrow="ALWAYS">
-                <Label style="-fx-font-weight: bold;" text="Données détaillées">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-
-                <TableView fx:id="detailedDataTable" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="dateColumn" prefWidth="150" text="Date/Heure" />
-                        <TableColumn fx:id="sectionColumn" prefWidth="100" text="Section" />
-                        <TableColumn fx:id="occupancyColumn" prefWidth="120" text="Occupation (%)" />
-                        <TableColumn fx:id="revenueColumn" prefWidth="120" text="Revenus (€)" />
-                        <TableColumn fx:id="avgDurationColumn" prefWidth="120" text="Durée moyenne" />
-                        <TableColumn fx:id="notesColumn" prefWidth="200" text="Notes" />
-                    </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                    </columnResizePolicy>
-                </TableView>
-            </VBox>
-
-            <!-- Boutons d'action -->
-            <HBox alignment="CENTER_RIGHT" spacing="10">
-                <Button fx:id="exportPdfButton" onAction="#handleExportPdf" text="Exporter PDF" />
-                <Button fx:id="exportExcelButton" onAction="#handleExportExcel" text="Exporter Excel" />
-                <Button fx:id="printButton" onAction="#handlePrint" text="Imprimer" />
-            </HBox>
-        </VBox>
-    </content>
+<ScrollPane prefHeight="1246.0" prefWidth="969.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.StatistiquesController">
+   <content>
+      <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="1056.0" prefWidth="967.0">
+          <content>
+              <VBox prefHeight="907.0" prefWidth="965.0" spacing="15">
+      
+                        <padding>
+                      <Insets bottom="20" left="20" right="20" top="20" />
+                  </padding>
+      
+                        <!-- Titre principal -->
+                  <HBox alignment="CENTER" style="-fx-background-color: #f0f0f0; -fx-background-radius: 5;">
+                      <padding>
+                          <Insets bottom="10" left="10" right="10" top="10" />
+                      </padding>
+                      <Text style="-fx-font-weight: bold;" text="Tableau de bord des statistiques">
+                          <font>
+                              <Font size="24.0" />
+                          </font>
+                      </Text>
+                  </HBox>
+      
+                        <!-- Filtres et contrôles -->
+                  <HBox fx:id="dateChoice" alignment="CENTER_LEFT" minHeight="-Infinity" spacing="10">
+                      <Label text="Période:" />
+                      <ComboBox fx:id="periodComboBox" promptText="Sélectionner une période">
+                          <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                  <String fx:value="Aujourd'hui" />
+                                  <String fx:value="Cette semaine" />
+                                  <String fx:value="Ce mois" />
+                                  <String fx:value="Cette année" />
+                              </FXCollections>
+                          </items>
+                      </ComboBox>
+                      <Label text="Type:" />
+                      <ComboBox fx:id="typeComboBox" promptText="Sélectionner un type">
+                          <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                  <String fx:value="Occupation" />
+                                  <String fx:value="Revenus" />
+                                  <String fx:value="Durée" />
+                                  <String fx:value="Tous" />
+                              </FXCollections>
+                          </items>
+                      </ComboBox>
+      
+                            <Button fx:id="refreshButton" onAction="#handleRefreshAction" styleClass="primary-button" text="Actualiser" />
+      
+                            <HBox.margin>
+                          <Insets bottom="5" top="5" />
+                      </HBox.margin>
+                  </HBox>
+      
+                        <!-- Statistiques principales en cartes -->
+                  <HBox alignment="CENTER" minHeight="-Infinity" spacing="20">
+                      <VBox style="-fx-background-color: #e6f7ff; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                          <Label styleClass="card-title" text="Places occupées" />
+                          <Text fx:id="occupiedSpotsText" styleClass="card-value" text="67%">
+                              <font>
+                                  <Font size="24.0" />
+                              </font>
+                          </Text>
+                          <Label fx:id="occupiedSpotsDetails" styleClass="card-details" text="134/200 places" />
+                      </VBox>
+      
+                            <VBox style="-fx-background-color: #e6ffe6; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                          <Label styleClass="card-title" text="Revenus du jour" />
+                          <Text fx:id="dailyRevenueText" styleClass="card-value" text="1 250 €">
+                              <font>
+                                  <Font size="24.0" />
+                              </font>
+                          </Text>
+                          <Label fx:id="revenueChange" styleClass="card-details" text="+12% vs hier" />
+                      </VBox>
+      
+                            <VBox style="-fx-background-color: #fff5e6; -fx-background-radius: 5; -fx-border-radius: 5; -fx-padding: 15;" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                          <Label styleClass="card-title" text="Durée moy. stationnement" />
+                          <Text fx:id="avgParkingDurationText" styleClass="card-value" text="2h 45min">
+                              <font>
+                                  <Font size="24.0" />
+                              </font>
+                          </Text>
+                          <Label fx:id="durationComparison" styleClass="card-details" text="-5% vs moyenne" />
+                      </VBox>
+      
+                            <HBox.margin>
+                          <Insets bottom="5" top="5" />
+                      </HBox.margin>
+                  </HBox>
+      
+                        <!-- Graphiques -->
+                  <TabPane prefHeight="425.0" prefWidth="925.0" VBox.vgrow="ALWAYS">
+                      <tabs>
+                          <Tab text="Évolution temporelle">
+                        <content>
+                           <Pane prefHeight="200.0" prefWidth="200.0" />
+                        </content>
+                        <content>
+                           <Pane prefHeight="200.0" prefWidth="200.0">
+                              <children>
+                                 <AreaChart fx:id="AreaChart" prefHeight="346.0" prefWidth="926.0">
+                                   <xAxis>
+                                     <CategoryAxis label="Jours de la semaine" side="BOTTOM" />
+                                   </xAxis>
+                                   <yAxis>
+                                     <NumberAxis label="Nombres de stationnements" side="LEFT" />
+                                   </yAxis>
+                                 </AreaChart>
+                              </children>
+                           </Pane>
+                        </content>
+                          </Tab>
+      
+                            </tabs>
+                  </TabPane>
+      
+                        <!-- Tableau de données détaillées -->
+                  <VBox VBox.vgrow="ALWAYS">
+                      <Label style="-fx-font-weight: bold;" text="Données détaillées">
+                          <font>
+                              <Font size="14.0" />
+                          </font>
+                      </Label>
+      
+                            <TableView fx:id="detailedDataTable" VBox.vgrow="ALWAYS">
+                          <columns>
+                              <TableColumn fx:id="dateColumn" prefWidth="150" text="Date/Heure" />
+                              <TableColumn fx:id="sectionColumn" prefWidth="100" text="Section" />
+                              <TableColumn fx:id="occupancyColumn" prefWidth="120" text="Occupation (%)" />
+                              <TableColumn fx:id="revenueColumn" prefWidth="120" text="Revenus (€)" />
+                              <TableColumn fx:id="avgDurationColumn" prefWidth="120" text="Durée moyenne" />
+                              <TableColumn fx:id="notesColumn" prefWidth="200" text="Notes" />
+                          </columns>
+                          <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                          </columnResizePolicy>
+                      </TableView>
+                  </VBox>
+      
+                        <!-- Boutons d'action -->
+                  <HBox alignment="CENTER_RIGHT" spacing="10">
+                      <Button fx:id="exportPdfButton" onAction="#handleExportPdf" text="Exporter PDF" />
+                      <Button fx:id="exportExcelButton" onAction="#handleExportExcel" text="Exporter Excel" />
+                      <Button fx:id="printButton" onAction="#handlePrint" text="Imprimer" />
+                  </HBox>
+              </VBox>
+          </content>
+      </ScrollPane>
+   </content>
 </ScrollPane>
