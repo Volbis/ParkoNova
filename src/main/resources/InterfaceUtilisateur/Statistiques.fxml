@@ -10,8 +10,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
@@ -52,17 +50,6 @@
                                   <String fx:value="Cette semaine" />
                                   <String fx:value="Ce mois" />
                                   <String fx:value="Cette année" />
-                              </FXCollections>
-                          </items>
-                      </ComboBox>
-                      <Label text="Type:" />
-                      <ComboBox fx:id="typeComboBox" promptText="Sélectionner un type">
-                          <items>
-                              <FXCollections fx:factory="observableArrayList">
-                                  <String fx:value="Occupation" />
-                                  <String fx:value="Revenus" />
-                                  <String fx:value="Durée" />
-                                  <String fx:value="Tous" />
                               </FXCollections>
                           </items>
                       </ComboBox>
@@ -110,32 +97,18 @@
                           <Insets bottom="5" top="5" />
                       </HBox.margin>
                   </HBox>
-      
-                        <!-- Graphiques -->
-                  <TabPane prefHeight="425.0" prefWidth="925.0" VBox.vgrow="ALWAYS">
-                      <tabs>
-                          <Tab text="Évolution temporelle">
-                        <content>
-                           <Pane prefHeight="200.0" prefWidth="200.0" />
-                        </content>
-                        <content>
-                           <Pane prefHeight="200.0" prefWidth="200.0">
-                              <children>
-                                 <AreaChart fx:id="AreaChart" prefHeight="346.0" prefWidth="926.0">
-                                   <xAxis>
-                                     <CategoryAxis label="Jours de la semaine" side="BOTTOM" />
-                                   </xAxis>
-                                   <yAxis>
-                                     <NumberAxis label="Nombres de stationnements" side="LEFT" />
-                                   </yAxis>
-                                 </AreaChart>
-                              </children>
-                           </Pane>
-                        </content>
-                          </Tab>
-      
-                            </tabs>
-                  </TabPane>
+               <Pane prefHeight="343.0" prefWidth="925.0">
+                  <children>
+                     <AreaChart fx:id="AreaChart" prefHeight="346.0" prefWidth="926.0">
+                       <xAxis>
+                         <CategoryAxis label="Jours de la semaine" side="BOTTOM" />
+                       </xAxis>
+                       <yAxis>
+                         <NumberAxis label="Nombres de stationnements" side="LEFT" />
+                       </yAxis>
+                     </AreaChart>
+                  </children>
+               </Pane>
       
                         <!-- Tableau de données détaillées -->
                   <VBox VBox.vgrow="ALWAYS">

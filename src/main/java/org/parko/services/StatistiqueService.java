@@ -6,65 +6,171 @@ import org.parko.database.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StatistiqueService {
 
-    /* Deja definit dans DashBoardController */
-/*
-    public int getPlacesTotales() {
-        int places = 0;
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT capaciteTotal FROM Parking WHERE id = ?")) {
-
-            stmt.setInt(1, parkingId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                places = rs.getInt("capaciteTotal");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return places;
-
-    }
-
-
-    // Retourne un objet stats qui contient la date, le nbVehicules, revenusTotal, frequentation
-    public Statistique getStatistiquesDuJour(LocalDate date) {
-        Statistique stats = new Statistique();
-        try (Connection conn = DatabaseConnection.getConnection();
-             CallableStatement stmt = conn.prepareCall("{CALL getStatistiques(?, ?)}")) {
-
-            stmt.setDate(1, Date.valueOf(date));
-            stmt.setInt(2, parkingId);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                stats.setDate(rs.getDate("date").toLocalDate());
-                stats.setNbVehicules(rs.getInt("nbVehicules"));
-                stats.setRevenusTotal(rs.getDouble("revenusTotal"));
-                stats.setFrequentation(rs.getInt("frequentation"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return stats;
-    }
-
-    // Taux d'occupations
-    public double getTauxOccupationJour(LocalDate date) {
-        Statistique stats = getStatistiquesDuJour(date);
-        int placesTotal = getPlacesTotales();
-
-        if (placesTotal == 0) return 0;
-        return (double) stats.getNbVehicules() / placesTotal * 100;
-    }
-*/
-
     /* ========= LES ENTREES ET SORTIES par periodes ============= */
+
+    // Entrées et sorties par type de véhicule et période
+    public Map<String, Map<String, Integer>> getVehiculesParTypeEtPeriode(LocalDate dateDebut, LocalDate dateFin, int parkingId, String periode) {
+        Map<String, Map<String, Integer>> result = new HashMap<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql;
+            
+            // Requête SQL différente selon la période
+            switch (periode) {
+                case "Aujourd'hui":
+                    // Grouper par heure pour aujourd'hui
+                    sql = "SELECT HOUR(es.dateEntree) AS point_temporel, tv.libelle AS type_vehicule, COUNT(*) AS nombre " +
+                        "FROM EntreeSortie es " +
+                        "JOIN Vehicule v ON es.vehicule_immatriculation = v.immatriculation " +
+                        "JOIN TypeVehicule tv ON v.type_id = tv.id " +  // Jointure avec TypeVehicule
+                        "JOIN Place p ON v.place_id = p.id " +  // Jointure avec Place pour obtenir le parking_id
+                        "WHERE DATE(es.dateEntree) = ? AND p.parking_id = ? " +
+                        "GROUP BY HOUR(es.dateEntree), tv.libelle " +
+                        "ORDER BY point_temporel";
+                    break;
+                    
+                case "Cette semaine":
+                    // Grouper par jour pour la semaine
+                    sql = "SELECT DAYOFWEEK(es.dateEntree) AS point_temporel, tv.libelle AS type_vehicule, COUNT(*) AS nombre " +
+                        "FROM EntreeSortie es " +
+                        "JOIN Vehicule v ON es.vehicule_immatriculation = v.immatriculation " +
+                        "JOIN TypeVehicule tv ON v.type_id = tv.id " +  // Jointure avec TypeVehicule
+                        "JOIN Place p ON v.place_id = p.id " +  // Jointure avec Place pour obtenir le parking_id
+                        "WHERE es.dateEntree BETWEEN ? AND ? AND p.parking_id = ? " +
+                        "GROUP BY DAYOFWEEK(es.dateEntree), tv.libelle " +
+                        "ORDER BY point_temporel";
+                    break;
+                    
+                case "Ce mois":
+                    // Grouper par semaine pour le mois
+                    sql = "SELECT FLOOR((DAYOFMONTH(es.dateEntree)-1)/7) + 1 AS point_temporel, tv.libelle AS type_vehicule, COUNT(*) AS nombre " +
+                        "FROM EntreeSortie es " +
+                        "JOIN Vehicule v ON es.vehicule_immatriculation = v.immatriculation " +
+                        "JOIN TypeVehicule tv ON v.type_id = tv.id " +  // Jointure avec TypeVehicule
+                        "JOIN Place p ON v.place_id = p.id " +  // Jointure avec Place pour obtenir le parking_id
+                        "WHERE es.dateEntree BETWEEN ? AND ? AND p.parking_id = ? " +
+                        "GROUP BY FLOOR((DAYOFMONTH(es.dateEntree)-1)/7) + 1, tv.libelle " +
+                        "ORDER BY point_temporel";
+                    break;
+                    
+                case "Cette année":
+                    // Grouper par mois pour l'année
+                    sql = "SELECT MONTH(es.dateEntree) AS point_temporel, tv.libelle AS type_vehicule, COUNT(*) AS nombre " +
+                        "FROM EntreeSortie es " +
+                        "JOIN Vehicule v ON es.vehicule_immatriculation = v.immatriculation " +
+                        "JOIN TypeVehicule tv ON v.type_id = tv.id " +  // Jointure avec TypeVehicule
+                        "JOIN Place p ON v.place_id = p.id " +  // Jointure avec Place pour obtenir le parking_id
+                        "WHERE es.dateEntree BETWEEN ? AND ? AND p.parking_id = ? " +
+                        "GROUP BY MONTH(es.dateEntree), tv.libelle " +
+                        "ORDER BY point_temporel";
+                    break;
+                    
+                default:
+                    // Par défaut, grouper par jour
+                    sql = "SELECT DATE_FORMAT(es.dateEntree, '%Y-%m-%d') AS point_temporel, tv.libelle AS type_vehicule, COUNT(*) AS nombre " +
+                        "FROM EntreeSortie es " +
+                        "JOIN Vehicule v ON es.vehicule_immatriculation = v.immatriculation " +
+                        "JOIN TypeVehicule tv ON v.type_id = tv.id " +  // Jointure avec TypeVehicule
+                        "JOIN Place p ON v.place_id = p.id " +  // Jointure avec Place pour obtenir le parking_id
+                        "WHERE es.dateEntree BETWEEN ? AND ? AND p.parking_id = ? " +
+                        "GROUP BY DATE_FORMAT(es.dateEntree, '%Y-%m-%d'), tv.libelle " +
+                        "ORDER BY point_temporel";
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                // Ajout du débogage pour vérifier la requête SQL et les paramètres
+                System.out.println("Requête SQL: " + sql);
+                System.out.println("Date début: " + dateDebut);
+                System.out.println("Date fin: " + dateFin);
+                System.out.println("Parking ID: " + parkingId);
+                
+                // Paramétrer la requête selon la période
+                if (periode.equals("Aujourd'hui")) {
+                    stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
+                    stmt.setInt(2, parkingId);
+                } else {
+                    stmt.setDate(1, java.sql.Date.valueOf(dateDebut));
+                    stmt.setDate(2, java.sql.Date.valueOf(dateFin));
+                    stmt.setInt(3, parkingId);
+                }
+                
+                ResultSet rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    int pointTemporelRaw = rs.getInt("point_temporel");
+                    String typeVehicule = rs.getString("type_vehicule");
+                    int nombre = rs.getInt("nombre");
+                    
+                    System.out.println("Résultat: Point=" + pointTemporelRaw + ", Type=" + typeVehicule + ", Nombre=" + nombre);
+                    
+                    // Formater le point temporel selon la période
+                    String pointTemporel;
+                    if (periode.equals("Aujourd'hui")) {
+                        pointTemporel = String.format("%02d:00", pointTemporelRaw);
+                    } else if (periode.equals("Cette semaine")) {
+                        // Convertir le numéro du jour (1-7) en nom du jour (Dimanche à Samedi en SQL, donc +1 pour avoir Lundi à Dimanche)
+                        String[] joursEnFrancais = {"Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"};
+                        pointTemporel = joursEnFrancais[pointTemporelRaw - 1];
+                    } else if (periode.equals("Ce mois")) {
+                        pointTemporel = "Semaine " + pointTemporelRaw;
+                    } else if (periode.equals("Cette année")) {
+                        String[] moisEnFrancais = {"Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Août", "Sep", "Oct", "Nov", "Déc"};
+                        pointTemporel = moisEnFrancais[pointTemporelRaw - 1];
+                    } else {
+                        pointTemporel = rs.getString("point_temporel");
+                    }
+                    
+                    // Ajouter ou mettre à jour l'entrée dans notre Map résultat
+                    if (!result.containsKey(pointTemporel)) {
+                        result.put(pointTemporel, new HashMap<>());
+                    }
+                    
+                    Map<String, Integer> vehiculesTypeMap = result.get(pointTemporel);
+                    vehiculesTypeMap.put(typeVehicule, nombre);
+                }
+                
+                // Assurez-vous que pour chaque point temporel, tous les types de véhicules sont représentés
+                List<String> pointsTemporels = new ArrayList<>(result.keySet());
+                for (String pointTemporel : pointsTemporels) {
+                    Map<String, Integer> vehiculesTypeMap = result.get(pointTemporel);
+                    if (!vehiculesTypeMap.containsKey("VOITURE")) {
+                        vehiculesTypeMap.put("VOITURE", 0);
+                    }
+                    if (!vehiculesTypeMap.containsKey("MOTO")) {
+                        vehiculesTypeMap.put("MOTO", 0);
+                    }
+                }
+                
+                // Pour la période "Aujourd'hui", s'assurer que toutes les heures sont représentées
+                if (periode.equals("Aujourd'hui")) {
+                    for (int heure = 8; heure <= 20; heure += 2) {
+                        String heureStr = String.format("%02d:00", heure);
+                        if (!result.containsKey(heureStr)) {
+                            Map<String, Integer> emptyMap = new HashMap<>();
+                            emptyMap.put("VOITURE", 0);
+                            emptyMap.put("MOTO", 0);
+                            result.put(heureStr, emptyMap);
+                        }
+                    }
+                }
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Erreur lors de la récupération des véhicules par type et période: " + e.getMessage());
+        }
+        
+        System.out.println("Résultat final: " + result);
+        return result;
+    }
+
     // Entrées par heures
     public Map<String, Integer> getEntreesParHeure(LocalDate date, int parkingId) {
         Map<String, Integer> entreesParHeure = new HashMap<>();

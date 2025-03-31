@@ -1,4 +1,8 @@
 package org.parko.controllers;
+import org.parko.services.StatistiqueService;
+import org.parko.services.VehiculeService;
+import org.parko.services.ParkingService;
+import org.parko.services.PaiementService;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +13,17 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.application.Platform;
+import javafx.scene.Node;
+
+import java.util.Set;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 import java.io.File;
 import java.net.URL;
@@ -20,7 +35,6 @@ public class StatistiquesController implements Initializable {
 
     // Déclaration des éléments FXML
     @FXML private ComboBox<String> periodComboBox;
-    @FXML private ComboBox<String> typeComboBox;
     @FXML private Text occupiedSpotsText;
     @FXML private Label occupiedSpotsDetails;
     @FXML private Text dailyRevenueText;
@@ -28,7 +42,6 @@ public class StatistiquesController implements Initializable {
     @FXML private Text avgParkingDurationText;
     @FXML private Label durationComparison;
 
-    @FXML private LineChart<String, Number> timeSeriesChart;
     @FXML private AreaChart<String, Number> AreaChart;
 
 
@@ -40,18 +53,36 @@ public class StatistiquesController implements Initializable {
     @FXML private TableColumn<StatistiqueEntry, String> avgDurationColumn;
     @FXML private TableColumn<StatistiqueEntry, String> notesColumn;
 
+
+    private StatistiqueService statistiqueService;
+    private VehiculeService vehiculeService;
+    private PaiementService paiementService;
+    private ParkingService parkingService;
+    private final int parkingId = 1;
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialiser les ComboBox
-        periodComboBox.setValue("Aujourd'hui");
-        typeComboBox.setValue("Occupation");
+        
+        // Initialiser les services
+        statistiqueService = new StatistiqueService();
+        vehiculeService = new VehiculeService();
+        paiementService = new PaiementService(parkingId);
+        parkingService = new ParkingService();
 
-        // Configuration des graphiques et tableaux avec des données initiales
-        configureCharts();
+        // Initialiser les ComboBox
+        periodComboBox.setValue("Cette semaine");  // Changé de "Aujourd'hui" à "Cette semaine"
+
+        // Configuration du tableau uniquement
         configureTable();
 
-        // Charger les données initiales
-        loadStatisticsData("Aujourd'hui", "Occupation");
+        // Charger les données initiales avec la période "Cette semaine"
+        loadStatisticsData("Cette semaine");
+        
+        // Ajouter des écouteurs d'événements pour les ComboBox
+        periodComboBox.setOnAction(event -> {
+            loadStatisticsData(periodComboBox.getValue());
+        });
+
     }
 
     /**
@@ -59,15 +90,13 @@ public class StatistiquesController implements Initializable {
      */
     @FXML
     private void handleRefreshAction(ActionEvent event) {
-        // Récupérer les valeurs sélectionnées dans les ComboBox
+        // Récupérer la période sélectionnée dans le ComboBox
         String selectedPeriod = periodComboBox.getValue();
-        String selectedType = typeComboBox.getValue();
+        
+        System.out.println("Rafraîchissement des statistiques pour la période: " + selectedPeriod);
 
-        System.out.println("Rafraîchissement des statistiques pour la période: " + selectedPeriod +
-                " et le type: " + selectedType);
-
-        // Actualiser les données selon les filtres sélectionnés
-        loadStatisticsData(selectedPeriod, selectedType);
+        // Actualiser les données selon la période sélectionnée
+        loadStatisticsData(selectedPeriod);
 
         // Afficher un message de confirmation
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -163,60 +192,6 @@ public class StatistiquesController implements Initializable {
 
     // ---------- Méthodes utilitaires ----------
 
-    /**
-     * Configure les graphiques avec des données d'exemple
-     */
-    private void configureCharts() {
-        // Configuration du graphique linéaire existant
-        if (timeSeriesChart != null) {
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Taux d'occupation");
-            series.getData().add(new XYChart.Data<>("8h", 25));
-            series.getData().add(new XYChart.Data<>("10h", 45));
-            series.getData().add(new XYChart.Data<>("12h", 70));
-            series.getData().add(new XYChart.Data<>("14h", 60));
-            series.getData().add(new XYChart.Data<>("16h", 80));
-            series.getData().add(new XYChart.Data<>("18h", 55));
-            series.getData().add(new XYChart.Data<>("20h", 30));
-            timeSeriesChart.getData().add(series);
-        }
-
-        // Configuration du nouveau AreaChart
-        if (AreaChart != null) {
-            // Série pour les voitures
-            XYChart.Series<String, Number> voituresSeries = new XYChart.Series<>();
-            voituresSeries.setName("Voitures");
-            voituresSeries.getData().add(new XYChart.Data<>("Lundi", 120));
-            voituresSeries.getData().add(new XYChart.Data<>("Mardi", 135));
-            voituresSeries.getData().add(new XYChart.Data<>("Mercredi", 115));
-            voituresSeries.getData().add(new XYChart.Data<>("Jeudi", 145));
-            voituresSeries.getData().add(new XYChart.Data<>("Vendredi", 170));
-            voituresSeries.getData().add(new XYChart.Data<>("Samedi", 210));
-            voituresSeries.getData().add(new XYChart.Data<>("Dimanche", 90));
-
-            // Série pour les motos
-            XYChart.Series<String, Number> motosSeries = new XYChart.Series<>();
-            motosSeries.setName("Motos");
-            motosSeries.getData().add(new XYChart.Data<>("Lundi", 35));
-            motosSeries.getData().add(new XYChart.Data<>("Mardi", 45));
-            motosSeries.getData().add(new XYChart.Data<>("Mercredi", 30));
-            motosSeries.getData().add(new XYChart.Data<>("Jeudi", 40));
-            motosSeries.getData().add(new XYChart.Data<>("Vendredi", 55));
-            motosSeries.getData().add(new XYChart.Data<>("Samedi", 70));
-            motosSeries.getData().add(new XYChart.Data<>("Dimanche", 25));
-
-            // Ajout des séries au graphique
-            AreaChart.getData().addAll(voituresSeries, motosSeries);
-            
-            // Style et configuration du graphique
-            AreaChart.setTitle("Stationnements par jour de la semaine");
-            AreaChart.setCreateSymbols(true); // Affiche les points sur le graphique
-            
-            // Application de styles CSS personnalisés pour les séries
-            applyAreaChartStyles();
-        }
-    }
-
     private void applyAreaChartStyles() {
         // Vérifier que le graphique existe
         if (AreaChart == null || AreaChart.getData().isEmpty()) return;
@@ -252,9 +227,32 @@ public class StatistiquesController implements Initializable {
                 }
             }
         }
+        styleLegendSymbols();
     }
 
-    private void updateAreaChartData(String period, String type) {
+    // Ajoutez cette méthode à votre classe
+    private void styleLegendSymbols() {
+        // Attendre que le graphique soit rendu pour accéder aux éléments de la légende
+        Platform.runLater(() -> {
+            // Couleurs exactes que vous utilisez pour vos séries
+            String voituresColor = "#1f77b4";  // Bleu
+            String motosColor = "#ff7f0e";     // Orange
+
+            // Chercher tous les symboles de la légende
+            Set<Node> legendSymbols = AreaChart.lookupAll(".chart-legend-item-symbol");
+            int index = 0;
+
+            // Appliquer les couleurs aux symboles
+            for (Node symbol : legendSymbols) {
+                String color = (index == 0) ? voituresColor : motosColor;
+                symbol.setStyle("-fx-background-color: " + color + ";");
+                index++;
+            }
+        });
+    }
+
+    //En charge de l'affichage des graphes
+    private void updateAreaChartData(String period) {
         if (AreaChart == null) return;
         
         // Effacer les données existantes
@@ -267,107 +265,151 @@ public class StatistiquesController implements Initializable {
         XYChart.Series<String, Number> motosSeries = new XYChart.Series<>();
         motosSeries.setName("Motos");
         
-        // Ajuster les données selon la période sélectionnée
-        switch (period) {
-            case "Aujourd'hui":
-                // Pour une journée, on affiche les heures au lieu des jours
-                voituresSeries.getData().add(new XYChart.Data<>("8h", 45));
-                voituresSeries.getData().add(new XYChart.Data<>("10h", 70));
-                voituresSeries.getData().add(new XYChart.Data<>("12h", 90));
-                voituresSeries.getData().add(new XYChart.Data<>("14h", 65));
-                voituresSeries.getData().add(new XYChart.Data<>("16h", 85));
-                voituresSeries.getData().add(new XYChart.Data<>("18h", 110));
-                voituresSeries.getData().add(new XYChart.Data<>("20h", 50));
+        // Définir les périodes de dates
+        LocalDate today = LocalDate.now();
+        LocalDate startDate;
+        LocalDate endDate = today;
+        
+        try {
+            // Déterminer les dates de début et fin selon la période
+            switch (period) {
+                case "Aujourd'hui":
+                    startDate = today;
+                    break;
+                case "Cette semaine":
+                    startDate = today.minusDays(today.getDayOfWeek().getValue() - 1);
+                    break;
+                case "Ce mois":
+                    startDate = today.withDayOfMonth(1);
+                    break;
+                case "Cette année":
+                    startDate = today.withDayOfMonth(1).withMonth(1);
+                    break;
+                default:
+                    startDate = today;
+            }
+            
+            // Récupérer les données de véhicules par type et période
+            Map<String, Map<String, Integer>> vehiculesParTypeEtPeriode = 
+                statistiqueService.getVehiculesParTypeEtPeriode(startDate, endDate, parkingId, period);
+            
+            System.out.println("Données récupérées: " + vehiculesParTypeEtPeriode);
+            
+            // Si aucune donnée, ajouter des données par défaut pour visualisation
+            if (vehiculesParTypeEtPeriode.isEmpty()) {
+                System.out.println("Aucune donnée trouvée, utilisation de données par défaut");
+                // Générer des données par défaut selon la période
+                vehiculesParTypeEtPeriode = genererDonneesParDefaut(period);
+            }
+            
+            // Déterminer l'ordre des points temporels selon la période
+            List<String> pointsTemporels = determinerOrdrePointsTemporels(period);
+            
+            // Ajouter les données aux séries
+            for (String pointTemporel : pointsTemporels) {
+                Map<String, Integer> typeMap = vehiculesParTypeEtPeriode.getOrDefault(pointTemporel, new HashMap<>());
+                int nbVoitures = typeMap.getOrDefault("VOITURE", 0);
+                int nbMotos = typeMap.getOrDefault("MOTO", 0);
                 
-                motosSeries.getData().add(new XYChart.Data<>("8h", 15));
-                motosSeries.getData().add(new XYChart.Data<>("10h", 20));
-                motosSeries.getData().add(new XYChart.Data<>("12h", 25));
-                motosSeries.getData().add(new XYChart.Data<>("14h", 18));
-                motosSeries.getData().add(new XYChart.Data<>("16h", 22));
-                motosSeries.getData().add(new XYChart.Data<>("18h", 30));
-                motosSeries.getData().add(new XYChart.Data<>("20h", 12));
-                break;
-                
-            case "Cette semaine":
-                // Données pour la semaine (par défaut)
-                voituresSeries.getData().add(new XYChart.Data<>("Lundi", 120));
-                voituresSeries.getData().add(new XYChart.Data<>("Mardi", 135));
-                voituresSeries.getData().add(new XYChart.Data<>("Mercredi", 115));
-                voituresSeries.getData().add(new XYChart.Data<>("Jeudi", 145));
-                voituresSeries.getData().add(new XYChart.Data<>("Vendredi", 170));
-                voituresSeries.getData().add(new XYChart.Data<>("Samedi", 210));
-                voituresSeries.getData().add(new XYChart.Data<>("Dimanche", 90));
-                
-                motosSeries.getData().add(new XYChart.Data<>("Lundi", 35));
-                motosSeries.getData().add(new XYChart.Data<>("Mardi", 45));
-                motosSeries.getData().add(new XYChart.Data<>("Mercredi", 30));
-                motosSeries.getData().add(new XYChart.Data<>("Jeudi", 40));
-                motosSeries.getData().add(new XYChart.Data<>("Vendredi", 55));
-                motosSeries.getData().add(new XYChart.Data<>("Samedi", 70));
-                motosSeries.getData().add(new XYChart.Data<>("Dimanche", 25));
-                break;
-                
-            case "Ce mois":
-                // Données simplifiées pour le mois (semaines)
-                voituresSeries.getData().add(new XYChart.Data<>("Semaine 1", 680));
-                voituresSeries.getData().add(new XYChart.Data<>("Semaine 2", 720));
-                voituresSeries.getData().add(new XYChart.Data<>("Semaine 3", 750));
-                voituresSeries.getData().add(new XYChart.Data<>("Semaine 4", 840));
-                
-                motosSeries.getData().add(new XYChart.Data<>("Semaine 1", 210));
-                motosSeries.getData().add(new XYChart.Data<>("Semaine 2", 230));
-                motosSeries.getData().add(new XYChart.Data<>("Semaine 3", 245));
-                motosSeries.getData().add(new XYChart.Data<>("Semaine 4", 270));
-                break;
-                
-            case "Cette année":
-                // Données pour l'année (mois)
-                voituresSeries.getData().add(new XYChart.Data<>("Jan", 2800));
-                voituresSeries.getData().add(new XYChart.Data<>("Fév", 2600));
-                voituresSeries.getData().add(new XYChart.Data<>("Mar", 3100));
-                voituresSeries.getData().add(new XYChart.Data<>("Avr", 3300));
-                voituresSeries.getData().add(new XYChart.Data<>("Mai", 3500));
-                voituresSeries.getData().add(new XYChart.Data<>("Juin", 3800));
-                voituresSeries.getData().add(new XYChart.Data<>("Juil", 4200));
-                voituresSeries.getData().add(new XYChart.Data<>("Août", 4400));
-                voituresSeries.getData().add(new XYChart.Data<>("Sep", 3900));
-                voituresSeries.getData().add(new XYChart.Data<>("Oct", 3600));
-                voituresSeries.getData().add(new XYChart.Data<>("Nov", 3200));
-                voituresSeries.getData().add(new XYChart.Data<>("Déc", 3500));
-                
-                motosSeries.getData().add(new XYChart.Data<>("Jan", 850));
-                motosSeries.getData().add(new XYChart.Data<>("Fév", 780));
-                motosSeries.getData().add(new XYChart.Data<>("Mar", 930));
-                motosSeries.getData().add(new XYChart.Data<>("Avr", 990));
-                motosSeries.getData().add(new XYChart.Data<>("Mai", 1050));
-                motosSeries.getData().add(new XYChart.Data<>("Juin", 1140));
-                motosSeries.getData().add(new XYChart.Data<>("Juil", 1260));
-                motosSeries.getData().add(new XYChart.Data<>("Août", 1320));
-                motosSeries.getData().add(new XYChart.Data<>("Sep", 1170));
-                motosSeries.getData().add(new XYChart.Data<>("Oct", 1080));
-                motosSeries.getData().add(new XYChart.Data<>("Nov", 960));
-                motosSeries.getData().add(new XYChart.Data<>("Déc", 1050));
-                break;
+                voituresSeries.getData().add(new XYChart.Data<>(pointTemporel, nbVoitures));
+                motosSeries.getData().add(new XYChart.Data<>(pointTemporel, nbMotos));
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            afficherErreur("Erreur de chargement des données", 
+                "Impossible de charger les données pour le graphique: " + e.getMessage());
+            return;
         }
         
         // Ajouter les séries au graphique
         AreaChart.getData().addAll(voituresSeries, motosSeries);
         
-        // Mettre à jour le titre selon le type de données sélectionné
-        if ("Occupation".equals(type)) {
-            AreaChart.setTitle("Occupation par véhicule - " + period);
-        } else if ("Revenus".equals(type)) {
-            AreaChart.setTitle("Revenus par véhicule - " + period);
-        } else if ("Durée".equals(type)) {
-            AreaChart.setTitle("Durée de stationnement - " + period);
-        } else {
-            AreaChart.setTitle("Stationnements par type de véhicule - " + period);
-        }
+        // Mettre à jour le titre du graphique
+        AreaChart.setTitle("Entrées par type de véhicule - " + period);
         
         // Appliquer les styles CSS personnalisés
         applyAreaChartStyles();
     }
 
+    /**
+     * Détermine l'ordre des points temporels selon la période
+     */
+    private List<String> determinerOrdrePointsTemporels(String period) {
+        List<String> points = new ArrayList<>();
+        
+        switch (period) {
+            case "Aujourd'hui":
+                // Points temporels pour aujourd'hui (heures)
+                for (int heure = 8; heure <= 20; heure += 2) {
+                    points.add(String.format("%02d:00", heure));
+                }
+                break;
+                
+            case "Cette semaine":
+                // Points temporels pour la semaine (jours)
+                points.add("Lundi");
+                points.add("Mardi");
+                points.add("Mercredi");
+                points.add("Jeudi");
+                points.add("Vendredi");
+                points.add("Samedi");
+                points.add("Dimanche");
+                break;
+                
+            case "Ce mois":
+                // Points temporels pour le mois (semaines)
+                points.add("Semaine 1");
+                points.add("Semaine 2");
+                points.add("Semaine 3");
+                points.add("Semaine 4");
+                break;
+                
+            case "Cette année":
+                // Points temporels pour l'année (mois)
+                points.add("Jan");
+                points.add("Fév");
+                points.add("Mar");
+                points.add("Avr");
+                points.add("Mai");
+                points.add("Jun");
+                points.add("Jul");
+                points.add("Août");
+                points.add("Sep");
+                points.add("Oct");
+                points.add("Nov");
+                points.add("Déc");
+                break;
+        }
+        
+        return points;
+    }
+
+    /**
+     * Génère des données par défaut pour la visualisation en l'absence de données réelles
+     */
+    private Map<String, Map<String, Integer>> genererDonneesParDefaut(String period) {
+        Map<String, Map<String, Integer>> donnees = new HashMap<>();
+        List<String> pointsTemporels = determinerOrdrePointsTemporels(period);
+        
+        // Générer des données différentes selon la période
+        Random random = new Random();
+        
+        for (String point : pointsTemporels) {
+            Map<String, Integer> typeMap = new HashMap<>();
+            typeMap.put("VOITURE", random.nextInt(10) + 5); // Entre 5 et 14 voitures
+            typeMap.put("MOTO", random.nextInt(8) + 2);     // Entre 2 et 9 motos
+            donnees.put(point, typeMap);
+        }
+        
+        return donnees;
+    }
+
+    // Méthode d'aide pour obtenir le nom du mois
+    private String getMonthName(int month) {
+        String[] monthNames = {"Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"};
+        return monthNames[month - 1];
+    }
 
     /**
      * Configure le tableau de données détaillées avec des données d'exemple
@@ -381,60 +423,155 @@ public class StatistiquesController implements Initializable {
         avgDurationColumn.setCellValueFactory(data -> data.getValue().avgDurationProperty());
         notesColumn.setCellValueFactory(data -> data.getValue().notesProperty());
 
-        // Ajouter des données d'exemple
-        ObservableList<StatistiqueEntry> data = FXCollections.observableArrayList(
-                new StatistiqueEntry("2023-07-10 10:00", "Niveau -1", 65, 320.50, "1h 45min", "Période normale"),
-                new StatistiqueEntry("2023-07-10 12:00", "Niveau -1", 78, 420.75, "2h 10min", "Heure de pointe"),
-                new StatistiqueEntry("2023-07-10 14:00", "Niveau -2", 45, 210.25, "1h 30min", ""),
-                new StatistiqueEntry("2023-07-10 16:00", "Niveau -2", 80, 450.00, "2h 25min", "Événement spécial"),
-                new StatistiqueEntry("2023-07-10 18:00", "Extérieur", 90, 520.50, "3h 05min", "Heure de pointe")
-        );
+        // Charger les données réelles
+        try {
+            // Récupérer les données des 5 derniers jours
+            LocalDate today = LocalDate.now();
+            LocalDate startDate = today.minusDays(5);
+            
+            // Récupérer les statistiques pour chaque jour
+            ObservableList<StatistiqueEntry> data = FXCollections.observableArrayList();
+            
+            for (LocalDate date = startDate; !date.isAfter(today); date = date.plusDays(1)) {
+                // Obtenir le taux d'occupation pour ce jour
+                int nbVehicules = vehiculeService.getNombreVehiculesPresentsJour(date);
+                int capaciteTotal = parkingService.getCapaciteTotal(parkingId);
+                double tauxOccupation = nbVehicules > 0 ? (double) nbVehicules / capaciteTotal * 100 : 0;
+                
+                // Obtenir les revenus pour ce jour
+                double revenus = paiementService.getRevenusJour(date);
+                
+                // Récupérer la durée moyenne de stationnement (exemple simplifié)
+                Map<String, Integer> durees = statistiqueService.getDureeStationnement(date, date, parkingId);
+                String dureeStr = "N/A";
+                int total = 0;
+                int count = 0;
+                for (Map.Entry<String, Integer> entry : durees.entrySet()) {
+                    count += entry.getValue();
+                    // Estimation de la durée moyenne en minutes
+                    if (entry.getKey().equals("< 1 heure")) total += entry.getValue() * 30;
+                    else if (entry.getKey().equals("1 - 3 heures")) total += entry.getValue() * 120;
+                    else if (entry.getKey().equals("3 - 6 heures")) total += entry.getValue() * 270;
+                    else total += entry.getValue() * 420; // > 6 heures
+                }
+                
+                if (count > 0) {
+                    int avgMinutes = total / count;
+                    dureeStr = String.format("%dh %02dmin", avgMinutes / 60, avgMinutes % 60);
+                }
+                
+                // Ajouter l'entrée
+                data.add(new StatistiqueEntry(
+                    date.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    "Tout le parking",
+                    tauxOccupation,
+                    revenus,
+                    dureeStr,
+                    date.equals(today) ? "Aujourd'hui" : ""
+                ));
+            }
 
-        detailedDataTable.setItems(data);
+            detailedDataTable.setItems(data);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            // En cas d'erreur, ajouter des données par défaut
+            ObservableList<StatistiqueEntry> defaultData = FXCollections.observableArrayList(
+                new StatistiqueEntry("N/A", "Erreur de chargement", 0, 0, "N/A", e.getMessage())
+            );
+            detailedDataTable.setItems(defaultData);
+        }
     }
 
     /**
-     * Charge les données statistiques en fonction de la période et du type sélectionnés
+     * Charge les données statistiques en fonction de la période sélectionnée
      */
-    private void loadStatisticsData(String period, String type) {
-        System.out.println("Chargement des données pour " + period + " et " + type);
-
-        // Dans une vraie application, vous récupéreriez les données de votre base de données
-        // Pour l'exemple, nous mettons simplement à jour les valeurs affichées
-
+    private void loadStatisticsData(String period) {
+        System.out.println("Chargement des données pour la période: " + period);
+        
+        LocalDate today = LocalDate.now();
+        LocalDate startDate;
+        LocalDate endDate = today;
+        
+        // Déterminer les dates de début et fin selon la période sélectionnée
         switch (period) {
             case "Aujourd'hui":
-                occupiedSpotsText.setText("67%");
-                occupiedSpotsDetails.setText("134/200 places");
-                dailyRevenueText.setText("1 250 €");
-                revenueChange.setText("+12% vs hier");
+                startDate = today;
                 break;
             case "Cette semaine":
-                occupiedSpotsText.setText("73%");
-                occupiedSpotsDetails.setText("146/200 places");
-                dailyRevenueText.setText("8 750 €");
-                revenueChange.setText("+8% vs semaine dernière");
+                startDate = today.minusDays(today.getDayOfWeek().getValue() - 1);
                 break;
             case "Ce mois":
-                occupiedSpotsText.setText("70%");
-                occupiedSpotsDetails.setText("140/200 places");
-                dailyRevenueText.setText("37 500 €");
-                revenueChange.setText("+15% vs mois dernier");
+                startDate = today.withDayOfMonth(1);
                 break;
             case "Cette année":
-                occupiedSpotsText.setText("65%");
-                occupiedSpotsDetails.setText("130/200 places");
-                dailyRevenueText.setText("450 000 €");
-                revenueChange.setText("+25% vs année dernière");
+                startDate = today.withDayOfMonth(1).withMonth(1);
                 break;
+            default:
+                startDate = today;
         }
-        updateAreaChartData(period, type);
+        
+        // Mettre à jour les indicateurs de performance
+        try {
+            // Obtenir le nombre total de places
+            int capaciteTotal = parkingService.getCapaciteTotal(parkingId);
+            
+            // Obtenir le nombre de véhicules actuellement présents
+            int vehiculesPresents = vehiculeService.getNombreVehiculesPresents();
+            
+            // Calculer le pourcentage d'occupation
+            double tauxOccupation = (double) vehiculesPresents / capaciteTotal * 100;
+            occupiedSpotsText.setText(String.format("%.0f%%", tauxOccupation));
+            occupiedSpotsDetails.setText(vehiculesPresents + "/" + capaciteTotal + " places");
+            
+            // Obtenir les revenus pour la période sélectionnée
+            double revenus = paiementService.getRevenusPeriode(startDate, endDate);
+            
+            // Afficher les revenus formatés
+            if (period.equals("Cette année")) {
+                dailyRevenueText.setText(String.format("%,.0f €", revenus));
+            } else if (period.equals("Ce mois") || period.equals("Cette semaine")) {
+                dailyRevenueText.setText(String.format("%,.0f €", revenus));
+            } else {
+                dailyRevenueText.setText(String.format("%,.2f €", revenus));
+            }
+            
+            // Récupérer des données pour la durée moyenne de stationnement
+            Map<String, Integer> durees = statistiqueService.getDureeStationnement(startDate, endDate, parkingId);
+            int dureeTotal = 0;
+            int nbVehicules = 0;
+            
+            // Calcul de la durée moyenne
+            for (Map.Entry<String, Integer> entry : durees.entrySet()) {
+                int count = entry.getValue();
+                nbVehicules += count;
+                
+                // Convertir les catégories de durée en minutes (approximatif)
+                if (entry.getKey().equals("< 1 heure")) dureeTotal += count * 30;
+                else if (entry.getKey().equals("1 - 3 heures")) dureeTotal += count * 120;
+                else if (entry.getKey().equals("3 - 6 heures")) dureeTotal += count * 270;
+                else dureeTotal += count * 420; // > 6 heures
+            }
+            
+            // Afficher la durée moyenne si des données sont disponibles
+            if (nbVehicules > 0) {
+                int dureeMoyenne = dureeTotal / nbVehicules;
+                avgParkingDurationText.setText(String.format("%dh %02dm", dureeMoyenne / 60, dureeMoyenne % 60));
+                durationComparison.setText("Durée moyenne");
+            } else {
+                avgParkingDurationText.setText("N/A");
+                durationComparison.setText("Aucune donnée");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            afficherErreur("Erreur de chargement", "Impossible de charger les statistiques: " + e.getMessage());
+        }
+        
+        // Mettre à jour le graphique avec les données réelles
+        updateAreaChartData(period);
     }
-    
-
-    /**
-     * Affiche une boîte de dialogue d'erreur
-     */
+        
     private void afficherErreur(String titre, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titre);
