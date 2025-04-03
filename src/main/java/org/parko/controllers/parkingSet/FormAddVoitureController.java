@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
 import org.parko.database.VehiculeDb;
+import org.parko.interfaces.ParkingEventManager;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -47,6 +48,8 @@ public class FormAddVoitureController {
                 this.enregistrementReussi = succesVoiture;
                 // Méssage de réuissite d'enregistrement
                 if (succesVoiture) {
+                    ParkingEventManager.getInstance().fireVehiculeEntree(immatriculation, type);
+                    
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Succès");
                     alert.setHeaderText(null);

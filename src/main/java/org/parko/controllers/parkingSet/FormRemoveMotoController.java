@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.parko.database.VehiculeDb;
+import org.parko.interfaces.ParkingEventManager;
 
 public class FormRemoveMotoController {
 
@@ -35,6 +36,8 @@ public class FormRemoveMotoController {
                 this.estSupprimé = supVoiture;
                 // Message de réussite de sortie
                 if (supVoiture) {
+                    ParkingEventManager.getInstance().fireVehiculeSortie(immatriculation, "VOITURE");
+
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Succès");
                     alert.setHeaderText(null);

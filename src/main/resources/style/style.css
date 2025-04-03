@@ -1285,3 +1285,27 @@
 .media-playlist-item:selected {
     -fx-background-color: rgba(59, 130, 246, 0.5);
 }
+
+.voiture-series {
+    -fx-stroke: #1E88E5;
+    -fx-fill: #1E88E580;
+}
+
+.moto-series {
+    -fx-stroke: #E53935;
+    -fx-fill: #E5393580;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.axis-label {
+    -fx-font-size: 14px;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}

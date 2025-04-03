@@ -5,12 +5,10 @@ import org.parko.database.DatabaseConnection;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StatistiqueService {
 
@@ -350,4 +348,69 @@ public class StatistiqueService {
         
         return results;
     }
+
+    /**
+ * Récupère le nombre de véhicules stationnés par type et par date
+ * @return Map avec les dates comme clés et une Map de types de véhicules comme valeurs
+ */
+public Map<LocalDate, Map<String, Integer>> getStationnementParTypeEtDate(LocalDate startDate, LocalDate endDate, int parkingId) {
+    Map<LocalDate, Map<String, Integer>> result = new LinkedHashMap<>();
+    
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String query = "SELECT " +
+                       "DATE(es.dateEntree) AS date, " +
+                       "tv.libelle AS type_vehicule, " +
+                       "COUNT(*) AS nombre " +
+                       "FROM EntreeSortie es " +
+                       "JOIN TypeVehicule tv ON es.type_vehicule_id = tv.id " +
+                       "WHERE DATE(es.dateEntree) BETWEEN ? AND ? " +
+                       "GROUP BY DATE(es.dateEntree), tv.libelle " +
+                       "ORDER BY DATE(es.dateEntree)";
+        
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setDate(1, java.sql.Date.valueOf(startDate));
+        stmt.setDate(2, java.sql.Date.valueOf(endDate));
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            LocalDate date = rs.getDate("date").toLocalDate();
+            String typeVehicule = rs.getString("type_vehicule");
+            int nombre = rs.getInt("nombre");
+            
+            // Initialiser la Map pour cette date si elle n'existe pas
+            if (!result.containsKey(date)) {
+                result.put(date, new HashMap<>());
+            }
+            
+            // Ajouter le nombre pour ce type de véhicule à cette date
+            result.get(date).put(typeVehicule, nombre);
+        }
+        
+        // Assurer que toutes les dates entre startDate et endDate sont présentes
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            if (!result.containsKey(currentDate)) {
+                result.put(currentDate, new HashMap<>());
+            }
+            
+            // S'assurer que chaque type a une entrée (même si c'est 0)
+            Map<String, Integer> typesForDate = result.get(currentDate);
+            if (!typesForDate.containsKey("VOITURE")) {
+                typesForDate.put("VOITURE", 0);
+            }
+            if (!typesForDate.containsKey("MOTO")) {
+                typesForDate.put("MOTO", 0);
+            }
+            
+            currentDate = currentDate.plusDays(1);
+        }
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.err.println("Erreur lors de la récupération des statistiques de stationnement: " + e.getMessage());
+    }
+    
+    return result;
+}
 }

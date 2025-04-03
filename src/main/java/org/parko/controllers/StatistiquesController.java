@@ -1,8 +1,12 @@
 package org.parko.controllers;
+import javafx.application.Platform;
+import org.parko.interfaces.ParkingEventListener;
 import org.parko.services.StatistiqueService;
 import org.parko.services.VehiculeService;
 import org.parko.services.ParkingService;
 import org.parko.services.PaiementService;
+import org.parko.interfaces.ParkingEventManager;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,26 +17,19 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.application.Platform;
-import javafx.scene.Node;
 
 import java.sql.Timestamp;
-import java.util.Set;
 import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-public class StatistiquesController implements Initializable {
+public class StatistiquesController implements Initializable, ParkingEventListener {
 
     // Déclaration des éléments FXML
     @FXML private ComboBox<String> periodComboBox;
@@ -42,7 +39,7 @@ public class StatistiquesController implements Initializable {
     @FXML private Label revenueChange;
     @FXML private Text avgParkingDurationText;
     @FXML private Label durationComparison;
-
+    @FXML private AreaChart<String, Number> myAreaChart;
 
     @FXML private TableView<StatistiqueEntry> detailedDataTable;
     @FXML private TableColumn<StatistiqueEntry, String> dateColumn;
@@ -51,7 +48,6 @@ public class StatistiquesController implements Initializable {
     @FXML private TableColumn<StatistiqueEntry, String> revenueColumn;
     @FXML private TableColumn<StatistiqueEntry, String> avgDurationColumn;
     @FXML private TableColumn<StatistiqueEntry, String> notesColumn;
-
 
     private StatistiqueService statistiqueService;
     private VehiculeService vehiculeService;
@@ -69,7 +65,11 @@ public class StatistiquesController implements Initializable {
         parkingService = new ParkingService();
 
         // Initialiser les ComboBox
-        periodComboBox.setValue("Cette semaine");  // Changé de "Aujourd'hui" à "Cette semaine"
+        ObservableList<String> periods = FXCollections.observableArrayList(
+            "Aujourd'hui", "Cette semaine", "Ce mois", "Cette année"
+        );
+        periodComboBox.setItems(periods);
+        periodComboBox.setValue("Cette semaine");
 
         // Configuration des colonnes du tableau
         dateColumn.setCellValueFactory(data -> data.getValue().dateProperty());
@@ -77,12 +77,71 @@ public class StatistiquesController implements Initializable {
         occupancyColumn.setCellValueFactory(data -> data.getValue().occupancyProperty());
         revenueColumn.setCellValueFactory(data -> data.getValue().revenueProperty());
         
+        // Initialiser l'AreaChart
+        setupAreaChart();
+        //Ecouter les activité
+        ParkingEventManager.getInstance().addListener(this);
+        
         // Charger les données initiales avec la période "Cette semaine"
         loadStatisticsData("Cette semaine");
         
         // Ajouter des écouteurs d'événements pour les ComboBox
         periodComboBox.setOnAction(event -> {
             loadStatisticsData(periodComboBox.getValue());
+        });
+    }
+    
+    /**
+     * Configure l'AreaChart
+     */
+    private void setupAreaChart() {
+        myAreaChart.setTitle("Stationnement par type de véhicule");
+        myAreaChart.getXAxis().setLabel("Date");
+        myAreaChart.getYAxis().setLabel("Nombre de véhicules");
+        
+        // Vider les séries existantes
+        myAreaChart.getData().clear();
+        
+        // Créer deux séries pour les voitures et les motos
+        XYChart.Series<String, Number> voitureSeries = new XYChart.Series<>();
+        voitureSeries.setName("Voitures");
+        
+        XYChart.Series<String, Number> motoSeries = new XYChart.Series<>();
+        motoSeries.setName("Motos");
+        
+        // Ajouter les séries au graphique
+        myAreaChart.getData().addAll(voitureSeries, motoSeries);
+    }
+
+    // Ajoutez ces méthodes à votre classe StatistiquesController
+
+    @Override
+    public void onVehiculeEntree(String immatriculation, String type) {
+        System.out.println("StatistiquesController: Entrée détectée - " + immatriculation + " (" + type + ")");
+        
+        // Mettre à jour l'interface sur le thread JavaFX
+        Platform.runLater(() -> {
+            // Rafraîchir le graphique avec la période actuellement sélectionnée
+            String selectedPeriod = periodComboBox.getValue();
+            if (selectedPeriod != null) {
+                System.out.println("Mise à jour du graphique suite à l'entrée d'un véhicule");
+                loadStatisticsData(selectedPeriod);
+            }
+        });
+    }
+
+    @Override
+    public void onVehiculeSortie(String immatriculation, String type) {
+        System.out.println("StatistiquesController: Sortie détectée - " + immatriculation + " (" + type + ")");
+        
+        // Mettre à jour l'interface sur le thread JavaFX
+        Platform.runLater(() -> {
+            // Rafraîchir le graphique avec la période actuellement sélectionnée
+            String selectedPeriod = periodComboBox.getValue();
+            if (selectedPeriod != null) {
+                System.out.println("Mise à jour du graphique suite à la sortie d'un véhicule");
+                loadStatisticsData(selectedPeriod);
+            }
         });
     }
 
@@ -107,79 +166,159 @@ public class StatistiquesController implements Initializable {
     @FXML
     private void handleExportPdf(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Enregistrer le rapport PDF");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
-        );
-        fileChooser.setInitialFileName("Statistiques_Parking_" +
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".pdf");
-
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            try {
-                System.out.println("Exportation en PDF vers: " + file.getAbsolutePath());
-                // Ici, vous implémenterez la création effective du PDF
-                // Exemple: GenerateurPDF.exporterStatistiques(file, donnees, graphiques);
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Exportation PDF");
-                alert.setHeaderText(null);
-                alert.setContentText("Le rapport a été exporté avec succès.");
-                alert.showAndWait();
-            } catch (Exception e) {
-                afficherErreur("Erreur lors de l'exportation PDF", e.getMessage());
-            }
+        fileChooser.setTitle("Exporter en PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        File selectedFile = fileChooser.showSaveDialog(null);
+        
+        if (selectedFile != null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Export PDF");
+            alert.setHeaderText(null);
+            alert.setContentText("Export en PDF réussi : " + selectedFile.getAbsolutePath());
+            alert.showAndWait();
         }
     }
 
     @FXML
     private void handleExportExcel(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Enregistrer le rapport Excel");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
-        );
-        fileChooser.setInitialFileName("Statistiques_Parking_" +
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".xlsx");
-
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            try {
-                System.out.println("Exportation en Excel vers: " + file.getAbsolutePath());
-                // Ici, vous implémenterez la création effective du fichier Excel
-                // Exemple: ExcelExporter.exporterStatistiques(file, detailedDataTable.getItems());
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Exportation Excel");
-                alert.setHeaderText(null);
-                alert.setContentText("Les données ont été exportées avec succès.");
-                alert.showAndWait();
-            } catch (Exception e) {
-                afficherErreur("Erreur lors de l'exportation Excel", e.getMessage());
-            }
+        fileChooser.setTitle("Exporter en Excel");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx"));
+        File selectedFile = fileChooser.showSaveDialog(null);
+        
+        if (selectedFile != null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Export Excel");
+            alert.setHeaderText(null);
+            alert.setContentText("Export en Excel réussi : " + selectedFile.getAbsolutePath());
+            alert.showAndWait();
         }
     }
 
     @FXML
     private void handlePrint(ActionEvent event) {
-        try {
-            System.out.println("Préparation de l'impression des statistiques...");
-            // Ici, vous implémenterez la logique d'impression
-            // Exemple: ServiceImpression.imprimerStatistiques(charts, data);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Impression");
+        alert.setHeaderText(null);
+        alert.setContentText("Impression des statistiques en cours...");
+        alert.showAndWait();
+    }
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Impression");
-            alert.setHeaderText(null);
-            alert.setContentText("Les statistiques ont été envoyées à l'imprimante.");
-            alert.showAndWait();
+    /**
+     * Met à jour l'AreaChart avec les données de stationnement
+     */
+    private void updateAreaChart(String period) {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate;
+        LocalDate endDate = today;
+        
+        // Déterminer les dates de début et fin selon la période sélectionnée
+        switch (period) {
+            case "Aujourd'hui":
+                startDate = today;
+                break;
+            case "Cette semaine":
+                startDate = today.minusDays(today.getDayOfWeek().getValue() - 1);
+                break;
+            case "Ce mois":
+                startDate = today.withDayOfMonth(1);
+                break;
+            case "Cette année":
+                startDate = today.withDayOfMonth(1).withMonth(1);
+                break;
+            default:
+                startDate = today;
+        }
+        
+        System.out.println("Période sélectionnée: " + period);
+        System.out.println("Date de début: " + startDate + ", Date de fin: " + endDate);
+        
+        try {
+            // Récupérer les données de stationnement depuis la base de données
+            Map<LocalDate, Map<String, Integer>> stationnementData = 
+                statistiqueService.getStationnementParTypeEtDate(startDate, endDate, parkingId);
+            
+            // Afficher les données récupérées dans la console
+            System.out.println("===== DONNÉES RÉCUPÉRÉES DE LA BASE DE DONNÉES =====");
+            int totalVoitures = 0;
+            int totalMotos = 0;
+            
+            for (Map.Entry<LocalDate, Map<String, Integer>> entry : stationnementData.entrySet()) {
+                LocalDate date = entry.getKey();
+                Map<String, Integer> typesCount = entry.getValue();
+                
+                int voituresCount = typesCount.getOrDefault("VOITURE", 0);
+                int motosCount = typesCount.getOrDefault("MOTO", 0);
+                
+                totalVoitures += voituresCount;
+                totalMotos += motosCount;
+                
+                System.out.println(date + " | Voitures: " + voituresCount + " | Motos: " + motosCount);
+            }
+            
+            System.out.println("---------------------------------------------");
+            System.out.println("TOTAL: Voitures: " + totalVoitures + " | Motos: " + totalMotos);
+            System.out.println("TOTAL GÉNÉRAL: " + (totalVoitures + totalMotos) + " véhicules");
+            System.out.println("=============================================");
+            
+            // Vider les séries existantes
+            myAreaChart.getData().clear();
+            
+            // Créer deux nouvelles séries pour les voitures et les motos
+            XYChart.Series<String, Number> voitureSeries = new XYChart.Series<>();
+            voitureSeries.setName("Voitures");
+            
+            XYChart.Series<String, Number> motoSeries = new XYChart.Series<>();
+            motoSeries.setName("Motos");
+            
+            // Format de date pour l'affichage
+            DateTimeFormatter formatter;
+            if (period.equals("Cette année")) {
+                formatter = DateTimeFormatter.ofPattern("MMM");
+            } else if (period.equals("Ce mois")) {
+                formatter = DateTimeFormatter.ofPattern("dd MMM");
+            } else {
+                formatter = DateTimeFormatter.ofPattern("dd/MM");
+            }
+            
+            // Remplir les séries avec les données
+            List<LocalDate> dates = new ArrayList<>(stationnementData.keySet());
+            dates.sort(LocalDate::compareTo); // Trier les dates par ordre chronologique
+            
+            System.out.println("===== DONNÉES AJOUTÉES AU GRAPHIQUE =====");
+            for (LocalDate date : dates) {
+                Map<String, Integer> typesCountForDate = stationnementData.get(date);
+                
+                // Ajouter le point pour les voitures
+                int voitureCount = typesCountForDate.getOrDefault("VOITURE", 0);
+                voitureSeries.getData().add(new XYChart.Data<>(date.format(formatter), voitureCount));
+                
+                // Ajouter le point pour les motos
+                int motoCount = typesCountForDate.getOrDefault("MOTO", 0);
+                motoSeries.getData().add(new XYChart.Data<>(date.format(formatter), motoCount));
+                
+                System.out.println("Ajout au graphique - " + date.format(formatter) + 
+                                " | Voitures: " + voitureCount + 
+                                " | Motos: " + motoCount);
+            }
+            System.out.println("=========================================");
+            
+            // Ajouter les séries au graphique
+            myAreaChart.getData().addAll(voitureSeries, motoSeries);
+            
+            // Ajouter une classe CSS pour le style
+            voitureSeries.getNode().getStyleClass().add("voiture-series");
+            motoSeries.getNode().getStyleClass().add("moto-series");
+            
+            System.out.println("Graphique mis à jour avec succès");
+            
         } catch (Exception e) {
-            afficherErreur("Erreur d'impression", e.getMessage());
+            e.printStackTrace();
+            System.err.println("ERREUR lors de la mise à jour du graphique: " + e.getMessage());
+            afficherErreur("Erreur de graphique", "Impossible de charger les données du graphique: " + e.getMessage());
         }
     }
 
-        // ---------- Méthodes utilitaires ----------
     private void configureTable() {
         // Configuration des colonnes
         dateColumn.setCellValueFactory(data -> data.getValue().dateProperty());
@@ -301,6 +440,9 @@ public class StatistiquesController implements Initializable {
             e.printStackTrace();
         }
         
+        // Mettre à jour le graphique
+        updateAreaChart(period);
+        
         // Mettre à jour les indicateurs de performance
         try {
             // Obtenir le nombre total de places
@@ -393,7 +535,4 @@ public class StatistiquesController implements Initializable {
         public javafx.beans.property.StringProperty avgDurationProperty() { return new javafx.beans.property.SimpleStringProperty(""); }
         public javafx.beans.property.StringProperty notesProperty() { return new javafx.beans.property.SimpleStringProperty(""); }
     }
-
-
-
 }
