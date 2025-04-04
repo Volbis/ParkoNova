@@ -12,6 +12,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -33,7 +35,7 @@
                       <padding>
                           <Insets bottom="10" left="10" right="10" top="10" />
                       </padding>
-                      <Text style="-fx-font-weight: bold;" text="Tableau de bord des statistiques">
+                      <Text style="-fx-font-weight: bold;" text="Statistiques &amp; Historiques">
                           <font>
                               <Font size="24.0" />
                           </font>
@@ -42,7 +44,7 @@
       
                         <!-- Filtres et contrôles -->
                   <HBox fx:id="dateChoice" alignment="CENTER_LEFT" minHeight="-Infinity" spacing="10">
-                      <Label text="Période:" />
+                      <Label prefHeight="18.0" prefWidth="71.0" text="Période:" />
                       <ComboBox fx:id="periodComboBox" promptText="Sélectionner une période">
                           <items>
                               <FXCollections fx:factory="observableArrayList">
@@ -54,7 +56,36 @@
                           </items>
                       </ComboBox>
       
-                            <Button fx:id="refreshButton" onAction="#handleRefreshAction" styleClass="primary-button" text="Actualiser" />
+                            <Button fx:id="refreshButton" onAction="#handleRefreshAction" prefHeight="36.0" prefWidth="127.0" styleClass="button-primary" text="Actualiser">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icon/refresh.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></Button>
+                  <HBox prefHeight="100.0" prefWidth="169.0" />
+                      <Button fx:id="exportPdfButton" onAction="#handleExportPdf" prefHeight="36.0" prefWidth="155.0" styleClass="exit-button" text="Exporter PDF">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icon/export.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                      <Button fx:id="exportExcelButton" onAction="#handleExportExcel" prefHeight="36.0" prefWidth="177.0" styleClass="exit-button" text="Exporter Excel">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icon/file.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
       
                             <HBox.margin>
                           <Insets bottom="5" top="5" />
@@ -75,22 +106,23 @@
       
                             <VBox styleClass="card_c" HBox.hgrow="ALWAYS">
                           <Label styleClass="card-title" text="Revenus du jour" />
-                          <Text fx:id="dailyRevenueText" styleClass="card-value" text="1 250 €">
+                          <Text fx:id="dailyRevenueText" styleClass="card-value" text="1 250 FCFA">
                               <font>
                                   <Font size="24.0" />
                               </font>
+                        <VBox.margin>
+                           <Insets top="10.0" />
+                        </VBox.margin>
                           </Text>
-                          <Label fx:id="revenueChange" styleClass="card-details" text="+12% vs hier" />
                       </VBox>
       
-                            <VBox styleClass="card_d" HBox.hgrow="ALWAYS">
-                          <Label styleClass="card-title" text="Durée moy. stationnement" />
+                            <VBox prefHeight="100.0" prefWidth="182.0" styleClass="card_d" HBox.hgrow="ALWAYS">
+                          <Label styleClass="card-title" text="Durée moyenne de stationnement" />
                           <Text fx:id="avgParkingDurationText" styleClass="card-value" text="2h 45min">
                               <font>
                                   <Font size="24.0" />
                               </font>
                           </Text>
-                          <Label fx:id="durationComparison" styleClass="card-details" text="-5% vs moyenne" />
                       </VBox>
       
                             <HBox.margin>
@@ -112,7 +144,7 @@
       
                         <!-- Tableau de données détaillées -->
                   <VBox prefHeight="708.0" prefWidth="925.0" VBox.vgrow="ALWAYS">
-                      <Label style="-fx-font-weight: bold;" text="Données détaillées">
+                      <Label style="-fx-font-weight: bold;" text="Historiques">
                           <font>
                               <Font size="14.0" />
                           </font>
@@ -136,13 +168,6 @@
                      <Insets />
                   </opaqueInsets>
                   </VBox>
-      
-                        <!-- Boutons d'action -->
-                  <HBox alignment="CENTER_RIGHT" spacing="10">
-                      <Button fx:id="exportPdfButton" onAction="#handleExportPdf" text="Exporter PDF" />
-                      <Button fx:id="exportExcelButton" onAction="#handleExportExcel" text="Exporter Excel" />
-                      <Button fx:id="printButton" onAction="#handlePrint" text="Imprimer" />
-                  </HBox>
               </VBox>
           </content>
       </ScrollPane>

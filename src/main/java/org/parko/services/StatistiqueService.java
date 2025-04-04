@@ -324,7 +324,7 @@ public class StatistiqueService {
                     // Ajouter le montant s'il est disponible
                     BigDecimal montant = rs.getBigDecimal("montant");
                     if (montant != null) {
-                        row.put("montant", montant.toString() + " €");
+                        row.put("montant", montant.toString() + "FCFA");
                     } else {
                         row.put("montant", "N/A");
                     }

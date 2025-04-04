@@ -471,11 +471,10 @@
 /* TableView */
 .table-view {
     -fx-background-color: transparent;
-    -fx-border-color: -border-color;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-effect: dropshadow(gaussian, -shadow-color, 4, 0, 0, 1);
+    -fx-border-width: 8px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 145, 226, 0.356), 10, 0.3, 0, 4);
 }
 
 .table-view .column-header-background {
@@ -780,36 +779,45 @@
 }
 
 /* Cards dashbord */
-.card_a{
-    -fx-background-color : #ffcb77;
+.card_a {
+    -fx-background-color: #ffcb77;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(255, 152, 0, 0.2), 15, 0.4, 0, 5);
+    -fx-border-color: rgba(255, 152, 0, 0.1);
+    -fx-border-width: 1px;
 }
 
-.card_b{
-    -fx-background-color : #4cc9f0;
+
+.card_b {
+    -fx-background-color: #4cc9f0;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 176, 255, 0.2), 15, 0.4, 0, 5);
+    -fx-border-color: rgba(0, 176, 255, 0.1);
+    -fx-border-width: 1px;
 }
 
-.card_c{
-    -fx-background-color : #00f5d4;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
-}
 
-.card_d{
-    -fx-background-color : #d4c2fc;
+.card_c {
+    -fx-background-color: #00f5d4;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-padding: 15px;
-    -fx-effect: dropshadow(gaussian, -shadow-color, 5, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0, 222, 185, 0.2), 15, 0.4, 0, 5);
+    -fx-border-color: rgba(0, 222, 185, 0.1);
+    -fx-border-width: 1px;
+}
+.card_d {
+    -fx-background-color: #d4c2fc;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(157, 111, 255, 0.2), 15, 0.4, 0, 5);
+    -fx-border-color: rgba(157, 111, 255, 0.1);
+    -fx-border-width: 1px;
 }
 
 /* Action Tiles */

@@ -26,7 +26,7 @@ public class HistoriqueDb {
                 System.out.println("Immatriculation : " + resultSet.getString("immatriculation") +
                         " | Date d'entrée : " + resultSet.getTimestamp("dateEntree") +
                         " | Date de sortie : " + resultSet.getTimestamp("dateSortie") +
-                        " | Montant : " + resultSet.getDouble("montant") + " €");
+                        " | Montant : " + resultSet.getDouble("montant") + " FCFA");
             }
             statement.close();
         } catch (SQLException e) {

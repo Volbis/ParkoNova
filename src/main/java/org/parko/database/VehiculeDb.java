@@ -1,5 +1,6 @@
 package org.parko.database;
 
+import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,7 @@ import javafx.scene.control.Alert;
 import java.sql.ResultSetMetaData;
 
 
-public class VehiculeDb {
+public class VehiculeDb implements Closeable {
     private Connection connection;
 
     public VehiculeDb() {
@@ -21,23 +22,28 @@ public class VehiculeDb {
 
     public boolean ajouterVehicule(String immatriculation, String type, int parkingId) {
         boolean succes = false;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
 
         try {
+            // Vérification de la connexion
+            if (connection == null || connection.isClosed()) {
+                connection = DatabaseConnection.getConnection();
+            }
+
             String query = "CALL ajouterVehicule(?, ?, ?);";
-            PreparedStatement statement = connection.prepareStatement(query);
+            statement = connection.prepareStatement(query);
             statement.setString(1, immatriculation);
             statement.setString(2, type);
             statement.setInt(3, parkingId);
 
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 // Récupérer le message de réussite ou d'échec
                 String message = resultSet.getString("message");
                 System.out.println(message);
                 succes = message != null && message.toLowerCase().contains("succès");
             }
-
-            statement.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,10 +54,11 @@ public class VehiculeDb {
             alert.setContentText("Erreur lors de l'ajout du véhicule : " + e.getMessage());
             alert.showAndWait();
         } finally {
+            // Fermer les ressources dans le bon ordre
             try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.close();
-                }
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                // Ne pas fermer la connexion ici pour assurer la cohérence entre les méthodes
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -62,6 +69,9 @@ public class VehiculeDb {
 
     public boolean sortirVehicule(String immatriculation, double tarifHoraire) {
         boolean success = false;
+        String numeroTicket = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
 
         try {
             // Vérification de la connexion
@@ -71,26 +81,62 @@ public class VehiculeDb {
 
             // Appel de la procédure stockée
             String query = "CALL sortirVehicule(?, ?);";
-            PreparedStatement statement = connection.prepareStatement(query);
+            statement = connection.prepareStatement(query);
             statement.setString(1, immatriculation);
             statement.setDouble(2, tarifHoraire);
 
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 String message = resultSet.getString("message");
-                double montant = resultSet.getDouble("montant");
+                double montant = 0;
+                
+                // Vérifier si la colonne 'montant' existe avant de tenter de la lire
+                try {
+                    montant = resultSet.getDouble("montant");
+                } catch (SQLException e) {
+                    // Si la colonne n'existe pas, utiliser une valeur par défaut
+                    System.out.println("Colonne 'montant' non présente dans les résultats");
+                }
+                
+                // Vérifier si la colonne 'numeroTicket' existe
+                try {
+                    numeroTicket = resultSet.getString("numeroTicket");
+                } catch (SQLException e) {
+                    // Si la colonne n'existe pas, numeroTicket reste null
+                    System.out.println("Colonne 'numeroTicket' non présente dans les résultats");
+                }
 
-                // Si le montant est positif, considérer l'opération comme réussie
-                if (montant >= 0) {
+                // Si le message contient "succès", considérer l'opération comme réussie
+                if (message != null && message.toLowerCase().contains("succès")) {
                     success = true;
 
-                    // Affichage du résultat dans une boîte de dialogue
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Véhicule retiré");
-                    alert.setHeaderText("Opération réussie");
-                    alert.setContentText(message + "\nMontant à payer : " + montant + " €");
-                    alert.showAndWait();
+                    // Créer un ticket de sortie si disponible
+                    if (numeroTicket != null) {
+                        try {
+                            TicketDb ticketDb = new TicketDb();
+                            
+                            // Affichage succinct du résultat
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Véhicule retiré");
+                            alert.setHeaderText("Opération réussie");
+                            alert.setContentText(message + "\nMontant à payer : " + montant + " FCFA");
+                            alert.showAndWait();
+                            
+                            // Afficher le ticket dans une fenêtre séparée
+                            ticketDb.afficherTicket(numeroTicket);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.out.println("Erreur lors de l'affichage du ticket: " + e.getMessage());
+                        }
+                    } else {
+                        // Cas où aucun ticket n'a été généré
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Véhicule retiré");
+                        alert.setHeaderText("Opération réussie");
+                        alert.setContentText(message + "\nMontant à payer : " + montant + " FCFA");
+                        alert.showAndWait();
+                    }
                 } else {
                     // Cas où la procédure retourne un message d'erreur
                     Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -108,7 +154,6 @@ public class VehiculeDb {
                 alert.showAndWait();
             }
 
-            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -137,8 +182,34 @@ public class VehiculeDb {
             alert.setHeaderText("Impossible de retirer le véhicule");
             alert.setContentText("Une erreur inattendue s'est produite : " + e.getMessage());
             alert.showAndWait();
+        } finally {
+            // Fermer les ressources dans le bon ordre
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                // Ne pas fermer la connexion ici pour assurer la cohérence
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return success;
+    }
+    
+    // Ajout d'une méthode pour fermer la connexion lorsque l'objet n'est plus utilisé
+    public void closeConnection() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Cette méthode sera appelée automatiquement lors de la finalisation de l'objet
+    @Override
+    public void close() {
+        closeConnection();
     }
 }

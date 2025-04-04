@@ -1,13 +1,30 @@
 package org.parko.controllers;
-import javafx.application.Platform;
+import org.apache.poi.ss.usermodel.Cell;
 import org.parko.interfaces.ParkingEventListener;
 import org.parko.services.StatistiqueService;
 import org.parko.services.VehiculeService;
 import org.parko.services.ParkingService;
 import org.parko.services.PaiementService;
 import org.parko.interfaces.ParkingEventManager;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import java.io.FileOutputStream;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.WritableImage;
+
+import javafx.application.Platform;
+import javax.imageio.ImageIO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,6 +41,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Desktop;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.time.LocalDateTime;
 
 import java.io.File;
 import java.net.URL;
@@ -38,7 +59,6 @@ public class StatistiquesController implements Initializable, ParkingEventListen
     @FXML private Text dailyRevenueText;
     @FXML private Label revenueChange;
     @FXML private Text avgParkingDurationText;
-    @FXML private Label durationComparison;
     @FXML private AreaChart<String, Number> myAreaChart;
 
     @FXML private TableView<StatistiqueEntry> detailedDataTable;
@@ -171,12 +191,134 @@ public class StatistiquesController implements Initializable, ParkingEventListen
         File selectedFile = fileChooser.showSaveDialog(null);
         
         if (selectedFile != null) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Export PDF");
-            alert.setHeaderText(null);
-            alert.setContentText("Export en PDF réussi : " + selectedFile.getAbsolutePath());
-            alert.showAndWait();
+            try {
+                // Créer le document PDF
+                Document document = new Document(PageSize.A4);
+                PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(selectedFile));
+                document.open();
+                
+                // Ajouter le titre
+                Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
+                Paragraph title = new Paragraph("Rapport de Statistiques - ParkoNova", titleFont);
+                title.setAlignment(Element.ALIGN_CENTER);
+                document.add(title);
+                
+                document.add(new Paragraph(" ")); // Espace
+                
+                // Ajouter la date et la période
+                Font normalFont = new Font(Font.FontFamily.HELVETICA, 12);
+                Font boldFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+                
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                Paragraph datePara = new Paragraph("Date du rapport: " + LocalDateTime.now().format(dtf), normalFont);
+                document.add(datePara);
+                
+                Paragraph periodPara = new Paragraph("Période analysée: " + periodComboBox.getValue(), normalFont);
+                document.add(periodPara);
+                
+                document.add(new Paragraph(" ")); // Espace
+                
+                // Ajouter les statistiques principales
+                PdfPTable statsTable = new PdfPTable(3); // 3 colonnes
+                statsTable.setWidthPercentage(100);
+                
+                // En-têtes
+                statsTable.addCell(createHeaderCell("Places occupées"));
+                statsTable.addCell(createHeaderCell("Revenus"));
+                statsTable.addCell(createHeaderCell("Durée moyenne"));
+                
+                // Valeurs
+                statsTable.addCell(createValueCell(occupiedSpotsText.getText() + "\n" + occupiedSpotsDetails.getText()));
+                statsTable.addCell(createValueCell(dailyRevenueText.getText()));
+                statsTable.addCell(createValueCell(avgParkingDurationText.getText()));
+                
+                document.add(statsTable);
+                
+                document.add(new Paragraph(" ")); // Espace
+                document.add(new Paragraph(" ")); // Espace
+                
+                // Ajouter le graphique
+                Paragraph graphTitle = new Paragraph("Stationnement par type de véhicule", boldFont);
+                document.add(graphTitle);
+                
+                // Capturer l'image du graphique
+                WritableImage image = myAreaChart.snapshot(new SnapshotParameters(), null);
+                ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", byteOutput);
+                com.itextpdf.text.Image chartImage = com.itextpdf.text.Image.getInstance(byteOutput.toByteArray());
+                chartImage.scaleToFit(500, 300);
+                chartImage.setAlignment(Element.ALIGN_CENTER);
+                document.add(chartImage);
+                
+                document.add(new Paragraph(" ")); // Espace
+                document.add(new Paragraph(" ")); // Espace
+                
+                // Ajouter le tableau d'historique
+                Paragraph tableTitle = new Paragraph("Historique des stationnements", boldFont);
+                document.add(tableTitle);
+                
+                PdfPTable historyTable = new PdfPTable(4);
+                historyTable.setWidthPercentage(100);
+                
+                // En-têtes
+                historyTable.addCell(createHeaderCell("Date/Heure"));
+                historyTable.addCell(createHeaderCell("Immatriculation"));
+                historyTable.addCell(createHeaderCell("Type de véhicule"));
+                historyTable.addCell(createHeaderCell("Durée stationnement"));
+                
+                // Données
+                for (StatistiqueEntry entry : detailedDataTable.getItems()) {
+                    historyTable.addCell(entry.dateProperty().get());
+                    historyTable.addCell(entry.sectionProperty().get());
+                    historyTable.addCell(entry.occupancyProperty().get());
+                    historyTable.addCell(entry.revenueProperty().get());
+                }
+                
+                document.add(historyTable);
+                
+                // Pied de page
+                Paragraph footer = new Paragraph("Rapport généré par ParkoNova © " + LocalDate.now().getYear(), normalFont);
+                footer.setAlignment(Element.ALIGN_RIGHT);
+                document.add(footer);
+                
+                document.close();
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Export PDF");
+                alert.setHeaderText(null);
+                alert.setContentText("Export en PDF réussi : " + selectedFile.getAbsolutePath());
+                alert.showAndWait();
+                
+                // Ouvrir le fichier PDF
+                Desktop.getDesktop().open(selectedFile);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur d'export");
+                alert.setHeaderText(null);
+                alert.setContentText("Erreur lors de l'export du PDF : " + e.getMessage());
+                alert.showAndWait();
+            }
         }
+    }
+
+    // Méthodes utilitaires pour créer les cellules du tableau PDF
+    private PdfPCell createHeaderCell(String text) {
+        Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE);
+        PdfPCell cell = new PdfPCell(new Phrase(text, headerFont));
+        cell.setBackgroundColor(new BaseColor(41, 128, 185)); // Bleu
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setPadding(5);
+        return cell;
+    }
+
+    private PdfPCell createValueCell(String text) {
+        Font valueFont = new Font(Font.FontFamily.HELVETICA, 12);
+        PdfPCell cell = new PdfPCell(new Phrase(text, valueFont));
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setPadding(5);
+        return cell;
     }
 
     @FXML
@@ -187,11 +329,92 @@ public class StatistiquesController implements Initializable, ParkingEventListen
         File selectedFile = fileChooser.showSaveDialog(null);
         
         if (selectedFile != null) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Export Excel");
-            alert.setHeaderText(null);
-            alert.setContentText("Export en Excel réussi : " + selectedFile.getAbsolutePath());
-            alert.showAndWait();
+            try {
+                // Créer un nouveau classeur Excel
+                XSSFWorkbook workbook = new XSSFWorkbook();
+                XSSFSheet sheet = workbook.createSheet("Statistiques ParkoNova");
+                
+                // Créer les styles pour l'en-tête et les cellules
+                XSSFCellStyle headerStyle = workbook.createCellStyle();
+                headerStyle.setFillForegroundColor(new XSSFColor(new byte[]{41, (byte)128, (byte)185}, null));
+                headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                
+                XSSFFont headerFont = workbook.createFont();
+                headerFont.setColor(IndexedColors.WHITE.getIndex());
+                headerFont.setBold(true);
+                headerStyle.setFont(headerFont);
+                
+                // Créer la ligne d'en-tête avec les titres des colonnes
+                Row headerRow = sheet.createRow(0);
+                String[] columnTitles = {
+                    "Date/Heure", 
+                    "Immatriculation",
+                    "Type de véhicule",
+                    "Durée stationnement"
+                };
+                
+                for (int i = 0; i < columnTitles.length; i++) {
+                    Cell cell = headerRow.createCell(i);
+                    cell.setCellValue(columnTitles[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+                
+                // Récupérer les données du tableau
+                ObservableList<StatistiqueEntry> items = detailedDataTable.getItems();
+                
+                // Créer les lignes avec les données
+                int rowNum = 1;
+                for (StatistiqueEntry entry : items) {
+                    Row row = sheet.createRow(rowNum++);
+                    
+                    // Date/Heure
+                    Cell cell0 = row.createCell(0);
+                    cell0.setCellValue(entry.dateProperty().get());
+                    
+                    // Immatriculation
+                    Cell cell1 = row.createCell(1);
+                    cell1.setCellValue(entry.sectionProperty().get());
+                    
+                    // Type de véhicule
+                    Cell cell2 = row.createCell(2);
+                    cell2.setCellValue(entry.occupancyProperty().get());
+                    
+                    // Durée de stationnement
+                    Cell cell3 = row.createCell(3);
+                    cell3.setCellValue(entry.revenueProperty().get());
+                }
+                
+                // Ajustement automatique de la largeur des colonnes
+                for (int i = 0; i < columnTitles.length; i++) {
+                    sheet.autoSizeColumn(i);
+                }
+                
+                // Enregistrer le classeur dans le fichier sélectionné
+                try (FileOutputStream outputStream = new FileOutputStream(selectedFile)) {
+                    workbook.write(outputStream);
+                }
+                
+                // Fermer le classeur
+                workbook.close();
+                
+                // Afficher un message de confirmation
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Export Excel");
+                alert.setHeaderText(null);
+                alert.setContentText("Export en Excel réussi : " + selectedFile.getAbsolutePath());
+                alert.showAndWait();
+                
+                // Ouvrir le fichier Excel
+                Desktop.getDesktop().open(selectedFile);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur d'export");
+                alert.setHeaderText(null);
+                alert.setContentText("Erreur lors de l'export Excel : " + e.getMessage());
+                alert.showAndWait();
+            }
         }
     }
 
@@ -461,11 +684,11 @@ public class StatistiquesController implements Initializable, ParkingEventListen
             
             // Afficher les revenus formatés
             if (period.equals("Cette année")) {
-                dailyRevenueText.setText(String.format("%,.0f €", revenus));
+                dailyRevenueText.setText(String.format("%,.0f FCFA", revenus));
             } else if (period.equals("Ce mois") || period.equals("Cette semaine")) {
-                dailyRevenueText.setText(String.format("%,.0f €", revenus));
+                dailyRevenueText.setText(String.format("%,.0f FCFA", revenus));
             } else {
-                dailyRevenueText.setText(String.format("%,.2f €", revenus));
+                dailyRevenueText.setText(String.format("%,.2f FCFA", revenus));
             }
             
             // Récupérer des données pour la durée moyenne de stationnement
@@ -489,10 +712,8 @@ public class StatistiquesController implements Initializable, ParkingEventListen
             if (nbVehicules > 0) {
                 int dureeMoyenne = dureeTotal / nbVehicules;
                 avgParkingDurationText.setText(String.format("%dh %02dm", dureeMoyenne / 60, dureeMoyenne % 60));
-                durationComparison.setText("Durée moyenne");
             } else {
                 avgParkingDurationText.setText("N/A");
-                durationComparison.setText("Aucune donnée");
             }
             
         } catch (Exception e) {

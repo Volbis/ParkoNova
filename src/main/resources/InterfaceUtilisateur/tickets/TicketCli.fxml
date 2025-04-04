@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.parko.controllers.parkingSet.TicketViewController">
+   <center>
+      <VBox alignment="CENTER" prefHeight="552.0" prefWidth="432.0" spacing="15.0" styleClass="ticket-container">
+         <children>
+            <Label styleClass="ticket-title" text="Ticket de Parking">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <TextArea fx:id="ticketTextArea" editable="false" prefHeight="400.0" prefWidth="400.0" styleClass="stats-card" wrapText="true">
+               <font>
+                  <Font name="Courier New" size="12.0" />
+               </font>
+            </TextArea>
+            <HBox alignment="CENTER" spacing="20.0">
+               <children>
+                  <Button fx:id="downloadButton" mnemonicParsing="false" onAction="#downloadTicket" styleClass="button-primary" text="Télécharger" />
+                  <Button fx:id="printButton" mnemonicParsing="false" onAction="#printTicket" styleClass="exit-button" text="Imprimer" />
+               </children>
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </center>
+</BorderPane>
